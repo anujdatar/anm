@@ -1,0 +1,10 @@
+curl
+wget
+git
+jq
+python3
+nodejs
+npm
+python3-pip
+python3-distutils
+python3-distutils-extra
