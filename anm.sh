@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# update && upgrade
-function do_upgrade() {
-  printf "upgrade installed packages\n"
-  printf "UNCOMMENT NEXT LINE TO INCLIDE UPDATE && UPGRADE \n\n"
-  # sudo apt update && sudo apt upgrade -y
-}
 
 # sys and nodejs arch detection
 function get_sys_node_arch() {
@@ -22,8 +16,6 @@ function get_sys_node_arch() {
     node_arch="linux-x64"
   fi
 
-  # printf "os architecture: $sys_arch\n"
-  # printf "nodejs architecture: $node_arch \n\n"
   echo $node_arch
 }
 
@@ -43,14 +35,18 @@ function check_depencency() {
       printf "Installed \n"
     fi
   done
-  # echo $not_installed
 
   if [ "$not_installed" == "" ]; then
     printf "\nDependencies OK. Proceeding ...\n"
   else
-    printf "\nInstalling missing dependencies ...\n"
-    printf "$not_installed \n\n"
-    # sudo apt install $not_installed
+    printf "Need to install missing dependencies: $not_installed\n"
+    user_input="Invalid input"
+    first=0
+    while [ "$user_input" == "Invalid input" ]
+    do 
+      user_input=$(yes_no_response $first)
+      echo $user_input
+    done
   fi
 }
 
@@ -68,17 +64,37 @@ function ls_all() {
 function ls_lts() {
   python3 web_json_parse.py $nodejs_dist_index $node_arch "ls_lts"
 }
-
+function ls_latest() {
+  python3 web_json_parse.py $nodejs_dist_index $node_arch "ls_latest"
+}
+function test() {
+  python3 web_json_parse.py $nodejs_dist_index $node_arch
+}
+function latest_lts_version_by_name() {
+  python3 web_json_parse.py $nodejs_dist_index $node_arch "lts_latest" $1
+}
 
 function anm() {
   get_sys_node_arch
-  check_depencency > /dev/null
+  check_depencency
 
-  if [ "$1" == "--ls" ]; then
-    ls_all
-  elif [ "$1" == "--ls=LTS" ]; then
-    ls_lts
+  if [ "$1" == "ls" ]; then
+    if [ "$2" == "" ]; then
+      ls_all
+    elif [ "$2" == "--lts" ]; then
+      ls_lts
+    elif [ "$2" == "--latest" ]; then
+      ls_latest
+    fi
+  elif [[ "$1" == "install" ]]; then
+    response=$(latest_lts_version_by_name $2)
+    if [ "$response" == "-1" ]; then
+      echo "Error!! Invalid LTS version name: $2"
+    fi
+  elif [[ "$1" == "test" ]]; then
+    test
   fi
 }
 
-anm --ls
+# anm ls --lts
+anm test
