@@ -3,26 +3,23 @@
 import sys
 import json
 from urllib.request import urlopen
-from distutils.version import LooseVersion
+from packaging.version import Version
+from urllib3 import Retry
 
 """
-download json index of node.js distributions
-Parameters:
-    <arg0>: self (name of program/file) -> String
-    <arg1>: URL for json source -> String
-    <arg2>: OS arch -> String
-    <arg3>: command -> String
+download and parse json index of node.js distributions
+param: <arg0>: str -> self (name of program/file)
+param: <arg1>: str -> URL for json source
+param: <arg2>: str -> OS architecture
+param: <arg3>: str -> command
 
 """
-node_url = sys.argv[1]
-os_arch = sys.argv[2]
 
-
-def get_response(url):
+def fetch_node_version_data(url: str):
     """
     Fetch json data from target URL
-    :param url: url string for json source
-    :return: raw json data
+    :param url: str -> url string for json source
+    :return: json -> raw json data from nodejs.org
     """
     open_url = urlopen(url)
     if open_url.getcode() == 200:
@@ -30,14 +27,14 @@ def get_response(url):
         json_data = json.loads(data)
         return json_data
     else:
-        print("Error receiving data from nodejs.org", open_url.getcode())
+        print('Error receiving data from nodejs.org', open_url.getcode())
 
 
-def filter_arch_compatible(data, os_filter):
+def filter_arch_compatible(data: list[dict], os_filter: str):
     """
     Filter out incompatible versions of node.js from available distributions
-    :param data: json data fetched from nodejs.org
-    :param os_filter: filter for json data -> String
+    :param data: list -> json data fetched from nodejs.org
+    :param os_filter: str -> filter for json data
     :return: filtered json data after extracting desired fields
     """
     tmp_data = []
@@ -47,37 +44,37 @@ def filter_arch_compatible(data, os_filter):
             tmp_data.append(item)
 
     if not tmp_data:
-        print("No suitable node.js versions/candidates found")
+        print('No suitable node.js versions/candidates found')
         return
     return tmp_data
 
 
-def version_compare(item1, item2):
+def version_compare(item1: dict, item2: dict):
     """
     Compare versions of node.js
-    :param item1: dictionary item for a node version -> Dictionary
-    :param item2: dictionary item for a node version -> Dictionary
-    :return: dictionary item with higher node version -> Dictionary
+    :param item1: dict -> dictionary item for a node version
+    :param item2: dict -> dictionary item for a node version
+    :return: dict -> dictionary item with higher node version
     """
     version1_no_v = item1['version'][1:]
     version2_no_v = item2['version'][1:]
-    return item1 if LooseVersion(version1_no_v) > LooseVersion(version2_no_v) else item2
+    return item1 if Version(version1_no_v) > Version(version2_no_v) else item2
 
 
-def get_major_version(item):
+def get_major_version(item: dict):
     """
     Get major version number from item dictionary
-    :param item: version number string -> Dictionary
-    :return: major version number -> generally Integer
+    :param item: dict -> version number string
+    :return: int -> major version number
     """
-    return LooseVersion(item['version'][1:]).version[0]
+    return Version(item['version'][1:]).major
 
 
-def print_node_version_data(item):
+def print_node_version_data(item: dict):
     """
     Format and print node version data
-    :param item: json item from data fetched from nodejs.org
-    :return: NOTHING. just console print data
+    :param item: dict -> json dict item from data fetched from nodejs.org
+    :return: None. just console print data
     """
     if item['lts']:
         if 'npm' in item:
@@ -91,33 +88,33 @@ def print_node_version_data(item):
             print('node.js %s' % (item['version']))
 
 
-def get_all_versions(data):
+def print_all_versions(data: list[dict]):
     """
     Console print list of compatible data
-    :param data: json data fetched from nodejs.org
-    :return: NOTHING, just console print formatted data
+    :param data: lit[dict] -> json data fetched from nodejs.org
+    :return: None, just console print formatted data
     """
     for item in data:
         print_node_version_data(item)
 
 
-def get_lts_versions(data):
+def print_lts_versions(data: list[dict]):
     """
     List compatible LTS versions of node.js
         Just prints list of available versions
-    :param data: json data fetched from nodejs.org
-    :return: NOTHING, just console print formatted data
+    :param data: list[dict] -> json data fetched from nodejs.org
+    :return: None, just console print formatted data
     """
     for item in data:
         if item['lts']:
             print_node_version_data(item)
 
 
-def get_latest_all(data):
+def get_latest_all(data: list[dict]):
     """
     List latest revisions of all compatible versions of node.js
-    :param data: json data fetched from nodejs.org
-    :return: NOTHING YET, maybe later
+    :param data: list[dict] -> json data fetched from nodejs.org
+    :return: list[dict] -> containing the latest versions of each node release
     """
     list_latest_versions = []
     last_item = {}
@@ -131,33 +128,44 @@ def get_latest_all(data):
         else:
             last_item = item
 
-    # return list_latest_versions
-    # print(list_latest_versions)
-    for x in list_latest_versions:
+    # for x in list_latest_versions:
+    #     print_node_version_data(x)
+    return list_latest_versions
+
+
+def print_latest_all(data: list[dict]):
+    """
+    Print all latest node release version data
+    :param data: list[dict] -> json data fetched from nodejs.org
+    : return: None
+    """
+    latest_version_data = get_latest_all(data)
+    # print(latest_version_data)
+    for x in latest_version_data:
         print_node_version_data(x)
 
 
-def get_lts_names(data):
+def get_lts_names(data: list[dict]):
     """
     List all LTS version codenames for node.js
         Just prints list of available versions
-    :param data: json data fetched from nodejs.org
-    :return: lts_list: list of LTS version code names -> List of Strings
+    :param data: list[dict] -> json data fetched from nodejs.org
+    :return: list[str] -> list of LTS version code names
     """
     lts_list = []
 
     for item in data:
         if (item['lts']) and (item['lts'] not in lts_list):
-            lts_list.append(item['lts'])
+            lts_list.append(item['lts'].lower())
     return lts_list
 
 
-def get_latest_lts(data, lts_name):
+def print_latest_lts_versions(data: list[dict], lts_name: str):
     """
     Get latest version of for said LTS
-    :param data: json data from node.js
-    :param lts_name: name of LTS version requested -> String
-    :return: latest node.js version number for LTS requested -> String
+    :param data: list[dict] -> json data from node.js
+    :param lts_name: str -> name of LTS version requested
+    :return: None -> latest node.js version number for LTS requested
     """
     last_item = {}
     for item in data:
@@ -169,29 +177,63 @@ def get_latest_lts(data, lts_name):
             last_item = version_compare(last_item, item)
 
     if not last_item:
-        # print("Error!! Invalid LTS version name: %s" % lts_name)
-        return -1
-    return last_item
+        print('Error!! Invalid LTS version name: %s' % lts_name)
+        sys.exit(1)
+    print_node_version_data(last_item)
 
+
+def print_latest_of_version(data: list[dict], version: str):
+    """
+    Get one latest version
+    :param data: list[dict] -> json data from node.js
+    :param lts_name: str -> name of LTS version requested
+    :return: None | Error -> latest node.js version number for LTS requested
+    """
+    lts_names_list = get_lts_names(data)
+    latest_version_data = get_latest_all(nodeVersions)
+
+    if not version:
+        latest_version = {}
+        for x in latest_version_data:
+            if not latest_version:
+                latest_version = x
+            else:
+                latest_version = version_compare(x, latest_version)
+        print(latest_version['version'])
+    elif version == 'latest_lts':
+        latest_version = {}
+        for x in latest_version_data:
+            if x['lts']:
+                if not latest_version:
+                    latest_version = x
+                else:
+                    latest_version = version_compare(x, latest_version)
+        print(latest_version['version'])
+    elif version.lower() in lts_names_list:
+        for x in latest_version_data:
+            if version.capitalize() == x['lts']:
+                # print('Getting latest LTS version of %s' % version.capitalize())
+                print(x['version'])
+    else:
+        print('Unknown node lts version')
+        sys.exit(1)
 
 if __name__ == '__main__':
-    nodeVersions = get_response(node_url)
+    node_url = sys.argv[1]
+    os_arch = sys.argv[2]
+
+    nodeVersions = fetch_node_version_data(node_url)
     nodeVersions = filter_arch_compatible(nodeVersions, os_arch)
-
-    # print(get_latest_lts(nodeVersions, 'Erbium'))
-
-    # print(get_major_version("v8.0.15a"))
-    # print(get_major_version("v99999"))
-
-    # get_latest_all(nodeVersions )
 
     if nodeVersions:
         if len(sys.argv)-1 >= 3:
             if sys.argv[3] == 'ls_all':
-                get_all_versions(nodeVersions)
+                print_all_versions(nodeVersions)
             elif sys.argv[3] == 'ls_lts':
-                get_lts_versions(nodeVersions)
+                print_lts_versions(nodeVersions)
             elif sys.argv[3] == 'ls_latest':
-                get_latest_all(nodeVersions)
+                print_latest_all(nodeVersions)
             elif sys.argv[3] == 'lts_latest':
-                print(get_latest_lts(nodeVersions, sys.argv[4]))
+                print_latest_lts_versions(nodeVersions, sys.argv[4])
+            elif sys.argv[3] == 'latest_of':
+                print_latest_of_version(nodeVersions, sys.argv[4])
