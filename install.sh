@@ -154,6 +154,8 @@
 
     echo "Adding ANM executable symlink to bin"
     sudo ln -s ${install_path}/anm /usr/bin/anm
+
+    sudo mkdir -p ${install_path}/versions/node
   else
     echo "Installing ANM for user $USER"
     install_path="/home/$USER/.anm"
@@ -166,5 +168,7 @@
     echo "Adding ANM executable symlink to bin"
     mkdir -p /home/$USER/.local/bin
     ln -s ${install_path}/anm /home/$USER/.local/bin/anm
+
+    sudo mkdir -p ${install_path}/versions/node
   fi
 }
