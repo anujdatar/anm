@@ -145,7 +145,7 @@
 
   if [[ $1 == 'system' ]]; then
     echo "Installing ANM for entire system"
-    install_path=$(/opt/anm)
+    install_path="/opt/anm"
 
     echo "Install path = $install_path"
     sudo git clone https://github.com/anujdatar/anm.git ${install_path}
@@ -156,7 +156,7 @@
     sudo ln -s ${install_path}/anm /usr/bin/anm
   else
     echo "Installing ANM for user $USER"
-    install_path=$(/home/$USER/.anm)
+    install_path="/home/$USER/.anm"
 
     echo "Install path = $install_path"
     git clone https://github.com/anujdatar/anm.git ${install_path}
