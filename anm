@@ -1,0 +1,108 @@
+#!/bin/bash
+
+node_dist_index="https://nodejs.org/dist/index.json"
+
+get_sys_node_arch() {
+  case $(uname -m) in
+    x86_64)
+      node_arch="linux-x64";;
+    aarch64|arm64)
+      node_arch="linux-arm64";;
+    armhf)
+      node_arch="linux-armv7l";;
+    *)
+      echo "Unable to recognize system architecture"
+      echo "Please contact developer on GitHub for solution"
+      exit 1;
+  esac
+}
+
+get_sys_node_arch
+if [[ $? == 1 ]]; then
+  exit 1
+fi
+
+ls_all() {
+  python3 web_json_parse.py $node_dist_index $node_arch "ls_all"
+}
+ls_lts() {
+  python3 web_json_parse.py $node_dist_index $node_arch "ls_lts"
+}
+ls_latest() {
+  python3 web_json_parse.py $node_dist_index $node_arch "ls_latest"
+}
+latest_lts_version_by_name() {
+  python3 web_json_parse.py $node_dist_index $node_arch "lts_latest" $1
+}
+latest_of_version() {
+  python3 web_json_parse.py $node_dist_index $node_arch "latest_of" $1
+}
+
+get_download_link() {
+  if [[ $1 == "" ]]; then
+    echo "No node version provided for download"
+    exit 1
+  fi
+  local base_link="https://nodejs.org/dist"
+  local version_page="$base_link/$1"
+  local download_filename="node-$1-$node_arch.tar.xz"
+  local download_link="$version_page/$download_filename"
+  echo $download_link
+}
+get_lts_download_link() {
+  local base_link="https://nodejs.org/dist"
+  local version_page="$base_link/latest-$1"
+  local download_filename="node-$2-$node_arch.tar.xz"
+  local download_link="$version_page/$download_filename"
+  echo $download_link
+}
+
+anm() {
+  if [[ $1 == "ls" ]]; then
+    if [[ $2 == "" ]]; then
+      ls_all
+    elif [[ $2 == "--lts" ]]; then
+      if [[ $3 ]]; then
+      latest_lts_version_by_name $3
+      else
+        ls_lts
+      fi
+    elif [[ $2 == "--latest" ]]; then
+      ls_latest
+    fi
+  elif [[ $1 == "install" ]]; then
+    if [[ $2 == "" ]]; then
+      version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "")
+      download_filename="node-$version-$node_arch.tar.xz"
+      download_link=$(get_download_link $version)
+    elif [[ $2 == "--lts" ]]; then
+      if [[ $3 ]]; then
+        lts_name=$(echo "$3" | tr '[:upper:]' '[:lower:]')
+        version=$(latest_of_version $lts_name)
+        download_filename="node-$version-$node_arch.tar.xz"
+        if [[ $? == 1 ]]; then
+          echo $version
+          exit 1
+        fi
+        download_link=$(get_lts_download_link $lts_name $version)
+        
+      else
+        version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "latest_lts")
+        download_filename="node-$version-$node_arch.tar.xz"
+        download_link=$(get_download_link $version)
+      fi
+    else
+      version=$2
+      download_filename="node-$version-$node_arch.tar.xz"
+      download_link=$(get_download_link $version)
+    fi
+    echo "Fetching nodejs version $version from:" 
+    echo "$download_link"
+
+    wget $download_link
+
+    echo; echo "Extracting nodejs"
+    tar -xf ${download_filename}
+  fi
+}
+anm $@
