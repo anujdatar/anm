@@ -1,5 +1,4 @@
 # coding=utf-8
-
 import sys
 import json
 from urllib.request import urlopen
@@ -128,8 +127,6 @@ def get_latest_all(data):
         else:
             last_item = item
 
-    # for x in list_latest_versions:
-    #     print_node_version_data(x)
     return list_latest_versions
 
 
@@ -140,9 +137,8 @@ def print_latest_all(data):
     : return: None
     """
     latest_version_data = get_latest_all(data)
-    # print(latest_version_data)
-    for x in latest_version_data:
-        print_node_version_data(x)
+    for item in latest_version_data:
+        print_node_version_data(item)
 
 
 def get_all_lts_names(data):
@@ -194,26 +190,25 @@ def print_latest_lts_version_number(data, version):
 
     if not version:
         latest_version = {}
-        for x in latest_version_data:
+        for item in latest_version_data:
             if not latest_version:
-                latest_version = x
+                latest_version = item
             else:
-                latest_version = version_compare(x, latest_version)
+                latest_version = version_compare(item, latest_version)
         print(latest_version['version'])
     elif version == 'latest_lts':
         latest_version = {}
-        for x in latest_version_data:
-            if x['lts']:
+        for item in latest_version_data:
+            if item['lts']:
                 if not latest_version:
-                    latest_version = x
+                    latest_version = item
                 else:
-                    latest_version = version_compare(x, latest_version)
+                    latest_version = version_compare(item, latest_version)
         print(latest_version['version'])
     elif version.lower() in lts_names_list:
-        for x in latest_version_data:
-            if version.capitalize() == x['lts']:
-                # print('Getting latest LTS version of %s' % version.capitalize())
-                print(x['version'])
+        for item in latest_version_data:
+            if version.capitalize() == item['lts']:
+                print(item['version'])
     else:
         print('Unknown node lts version')
         sys.exit(1)
