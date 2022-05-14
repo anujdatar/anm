@@ -15,7 +15,7 @@ param: <arg3>: str -> command
 
 """
 
-def fetch_node_version_data(url: str):
+def fetch_node_version_data(url):
     """
     Fetch json data from target URL
     :param url: str -> url string for json source
@@ -30,7 +30,7 @@ def fetch_node_version_data(url: str):
         print('Error receiving data from nodejs.org', open_url.getcode())
 
 
-def filter_arch_compatible(data: list[dict], os_filter: str):
+def filter_arch_compatible(data, os_filter):
     """
     Filter out incompatible versions of node.js from available distributions
     :param data: list -> json data fetched from nodejs.org
@@ -49,7 +49,7 @@ def filter_arch_compatible(data: list[dict], os_filter: str):
     return tmp_data
 
 
-def version_compare(item1: dict, item2: dict):
+def version_compare(item1, item2):
     """
     Compare versions of node.js
     :param item1: dict -> dictionary item for a node version
@@ -61,7 +61,7 @@ def version_compare(item1: dict, item2: dict):
     return item1 if Version(version1_no_v) > Version(version2_no_v) else item2
 
 
-def get_major_version(item: dict):
+def get_major_version(item):
     """
     Get major version number from item dictionary
     :param item: dict -> version number string
@@ -70,7 +70,7 @@ def get_major_version(item: dict):
     return Version(item['version'][1:]).major
 
 
-def print_node_version_data(item: dict):
+def print_node_version_data(item):
     """
     Format and print node version data
     :param item: dict -> json dict item from data fetched from nodejs.org
@@ -88,7 +88,7 @@ def print_node_version_data(item: dict):
             print('node.js %s' % (item['version']))
 
 
-def print_all_versions(data: list[dict]):
+def print_all_versions(data):
     """
     Console print list of compatible data
     :param data: lit[dict] -> json data fetched from nodejs.org
@@ -98,7 +98,7 @@ def print_all_versions(data: list[dict]):
         print_node_version_data(item)
 
 
-def print_lts_versions(data: list[dict]):
+def print_all_lts_versions(data):
     """
     List compatible LTS versions of node.js
         Just prints list of available versions
@@ -110,7 +110,7 @@ def print_lts_versions(data: list[dict]):
             print_node_version_data(item)
 
 
-def get_latest_all(data: list[dict]):
+def get_latest_all(data):
     """
     List latest revisions of all compatible versions of node.js
     :param data: list[dict] -> json data fetched from nodejs.org
@@ -133,7 +133,7 @@ def get_latest_all(data: list[dict]):
     return list_latest_versions
 
 
-def print_latest_all(data: list[dict]):
+def print_latest_all(data):
     """
     Print all latest node release version data
     :param data: list[dict] -> json data fetched from nodejs.org
@@ -145,7 +145,7 @@ def print_latest_all(data: list[dict]):
         print_node_version_data(x)
 
 
-def get_lts_names(data: list[dict]):
+def get_all_lts_names(data):
     """
     List all LTS version codenames for node.js
         Just prints list of available versions
@@ -160,9 +160,9 @@ def get_lts_names(data: list[dict]):
     return lts_list
 
 
-def print_latest_lts_versions(data: list[dict], lts_name: str):
+def print_latest_lts_version_data(data, lts_name):
     """
-    Get latest version of for said LTS
+    Get latest version data of for said LTS name
     :param data: list[dict] -> json data from node.js
     :param lts_name: str -> name of LTS version requested
     :return: None -> latest node.js version number for LTS requested
@@ -182,14 +182,14 @@ def print_latest_lts_versions(data: list[dict], lts_name: str):
     print_node_version_data(last_item)
 
 
-def print_latest_of_version(data: list[dict], version: str):
+def print_latest_lts_version_number(data, version):
     """
-    Get one latest version
+    Get just latest version number of said LTS name
     :param data: list[dict] -> json data from node.js
     :param lts_name: str -> name of LTS version requested
     :return: None | Error -> latest node.js version number for LTS requested
     """
-    lts_names_list = get_lts_names(data)
+    lts_names_list = get_all_lts_names(data)
     latest_version_data = get_latest_all(nodeVersions)
 
     if not version:
@@ -230,10 +230,10 @@ if __name__ == '__main__':
             if sys.argv[3] == 'ls_all':
                 print_all_versions(nodeVersions)
             elif sys.argv[3] == 'ls_lts':
-                print_lts_versions(nodeVersions)
+                print_all_lts_versions(nodeVersions)
             elif sys.argv[3] == 'ls_latest':
                 print_latest_all(nodeVersions)
-            elif sys.argv[3] == 'lts_latest':
-                print_latest_lts_versions(nodeVersions, sys.argv[4])
-            elif sys.argv[3] == 'latest_of':
-                print_latest_of_version(nodeVersions, sys.argv[4])
+            elif sys.argv[3] == 'lts_latest_data':
+                print_latest_lts_version_data(nodeVersions, sys.argv[4])
+            elif sys.argv[3] == 'lts_latest_number':
+                print_latest_lts_version_number(nodeVersions, sys.argv[4])
