@@ -14,6 +14,7 @@ param: <arg3>: str -> command
 
 """
 
+
 def fetch_node_version_data(url):
     """
     Fetch json data from target URL
@@ -178,7 +179,7 @@ def print_latest_lts_version_data(data, lts_name):
     print_node_version_data(last_item)
 
 
-def print_latest_lts_version_number(data, version):
+def print_latest_lts_version_number(data, lts_name):
     """
     Get just latest version number of said LTS name
     :param data: list[dict] -> json data from node.js
@@ -188,7 +189,7 @@ def print_latest_lts_version_number(data, version):
     lts_names_list = get_all_lts_names(data)
     latest_version_data = get_latest_all(nodeVersions)
 
-    if not version:
+    if not lts_name:
         latest_version = {}
         for item in latest_version_data:
             if not latest_version:
@@ -196,7 +197,7 @@ def print_latest_lts_version_number(data, version):
             else:
                 latest_version = version_compare(item, latest_version)
         print(latest_version['version'])
-    elif version == 'latest_lts':
+    elif lts_name == 'latest_lts':
         latest_version = {}
         for item in latest_version_data:
             if item['lts']:
@@ -205,13 +206,14 @@ def print_latest_lts_version_number(data, version):
                 else:
                     latest_version = version_compare(item, latest_version)
         print(latest_version['version'])
-    elif version.lower() in lts_names_list:
+    elif lts_name.lower() in lts_names_list:
         for item in latest_version_data:
-            if version.capitalize() == item['lts']:
+            if lts_name.capitalize() == item['lts']:
                 print(item['version'])
     else:
         print('Unknown node lts version')
         sys.exit(1)
+
 
 if __name__ == '__main__':
     node_url = sys.argv[1]
