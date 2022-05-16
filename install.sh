@@ -146,29 +146,37 @@
   if [[ $1 == 'system' ]]; then
     echo "Installing ANM for entire system"
     install_path="/opt/anm"
+    bin_path="/usr/bin"
 
     echo "Install path = $install_path"
-    sudo git clone https://github.com/anujdatar/anm.git ${install_path}
-
-    chmod +x ${install_path}/anm
-
-    echo "Adding ANM executable symlink to bin"
-    sudo ln -s ${install_path}/anm /usr/bin/anm
-
-    sudo mkdir -p ${install_path}/versions/node
   else
     echo "Installing ANM for user $USER"
+
     install_path="/home/$USER/.anm"
+    bin_path="/home/$USER/.local/bin"
 
     echo "Install path = $install_path"
-    git clone https://github.com/anujdatar/anm.git ${install_path}
-
-    chmod +x ${install_path}/anm
-
-    echo "Adding ANM executable symlink to bin"
-    mkdir -p /home/$USER/.local/bin
-    ln -s ${install_path}/anm /home/$USER/.local/bin/anm
-
-    sudo mkdir -p ${install_path}/versions/node
   fi
+
+  is_sudo() {
+    if [[ $install_path == "/opt/anm" ]]; then
+      sudo $@
+    else
+      $@
+    fi
+  }
+
+  is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
+
+  chmod +x ${install_path}/anm.sh
+
+  echo "Adding ANM executable symlink to bin"
+  is_sudo mkdir -p ${bin_path}
+  is_sudo ln -s ${install_path}/anm.sh ${bin_path}/anm
+
+  is_sudo mkdir -p ${install_path}/versions/node
+  is_sudo touch ${install_path}/active
+  is_sudo touch ${install_path}/installed
+  
+  echo $install_path | is_sudo tee $install_path/path &> /dev/null
 }
