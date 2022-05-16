@@ -2,7 +2,20 @@
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
+# some text color formatting functions
+  format_red() {
+    ### Usage: format_dist "string", use \n at the end for linebreak ###
+    echo -en "\e[31m$1\e[0m"
+  }
+  format_green() {
+    echo -en "\e[32m$1\e[0m"
+  }
+  format_yellow() {
+    echo -en "\e[33m$1\e[0m"
+  }
+
 get_sys_node_arch() {
+  ### get system arch, return strings that nodejs website uses ###
   case $(uname -m) in
     x86_64)
       node_arch="linux-x64";;
@@ -11,36 +24,22 @@ get_sys_node_arch() {
     armhf)
       node_arch="linux-armv7l";;
     *)
-      echo "Unable to recognize system architecture"
-      echo "Please contact developer on GitHub for solution"
-      exit 1;
+      format_red "Unable to recognize system architecture\n"
+      format_red "Please contact developer on GitHub for solution\n"
+      exit 1;;
   esac
 }
 
 get_sys_node_arch
 if [[ $? == 1 ]]; then
+  format_red "System OS and architecture not supported by ANM\n"
+  format_red "Please check compatibility or contact developer\n"
   exit 1
 fi
 
-ls_all() {
-  python3 web_json_parse.py $node_dist_index $node_arch "ls_all"
-}
-ls_lts() {
-  python3 web_json_parse.py $node_dist_index $node_arch "ls_lts"
-}
-ls_latest() {
-  python3 web_json_parse.py $node_dist_index $node_arch "ls_latest"
-}
-latest_lts_version_by_name() {
-  python3 web_json_parse.py $node_dist_index $node_arch "lts_latest" $1
-}
-latest_of_version() {
-  python3 web_json_parse.py $node_dist_index $node_arch "latest_of" $1
-}
-
 get_download_link() {
   if [[ $1 == "" ]]; then
-    echo "No node version provided for download"
+    format_red "No node version provided for download\n"
     exit 1
   fi
   local base_link="https://nodejs.org/dist"
@@ -57,52 +56,143 @@ get_lts_download_link() {
   echo $download_link
 }
 
-anm() {
-  if [[ $1 == "ls" ]]; then
-    if [[ $2 == "" ]]; then
-      ls_all
-    elif [[ $2 == "--lts" ]]; then
-      if [[ $3 ]]; then
-      latest_lts_version_by_name $3
+get_anm_install_location() {
+  echo $(cat ./path)
+}
+get_bin_path() {
+  local install_path=$(get_anm_install_location)
+  
+  if [[ $install_path == "/opt/anm" ]]; then
+    echo "/usr/bin"
+  else
+    echo "/home/$USER/.local/bin"
+  fi
+}
+
+ls_all() {
+  python3 web_json_parse.py $node_dist_index $node_arch "ls_all"
+}
+ls_lts() {
+  python3 web_json_parse.py $node_dist_index $node_arch "ls_lts"
+}
+ls_latest() {
+  python3 web_json_parse.py $node_dist_index $node_arch "ls_latest"
+}
+ls_latest_lts_version_data_by_name() {
+  python3 web_json_parse.py $node_dist_index $node_arch "lts_latest_data" $1
+}
+latest_lts_version_number() {
+  python3 web_json_parse.py $node_dist_index $node_arch "lts_latest_number" $1
+}
+
+anm_ls_remote() {
+  case $1 in
+    "--lts")
+      if [[ $2 ]]; then
+        ls_latest_lts_version_data_by_name $2
       else
         ls_lts
-      fi
-    elif [[ $2 == "--latest" ]]; then
-      ls_latest
-    fi
-  elif [[ $1 == "install" ]]; then
-    if [[ $2 == "" ]]; then
-      version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "")
-      download_filename="node-$version-$node_arch.tar.xz"
-      download_link=$(get_download_link $version)
-    elif [[ $2 == "--lts" ]]; then
-      if [[ $3 ]]; then
-        lts_name=$(echo "$3" | tr '[:upper:]' '[:lower:]')
-        version=$(latest_of_version $lts_name)
-        download_filename="node-$version-$node_arch.tar.xz"
-        if [[ $? == 1 ]]; then
-          echo $version
-          exit 1
-        fi
-        download_link=$(get_lts_download_link $lts_name $version)
-        
+      fi;;
+    "--latest")
+      ls_latest;;
+    "")
+      ls_all;;
+  esac
+}
+
+is_sudo() {
+  local install_path=$(get_anm_install_location)
+  if [[ $install_path == "/opt/anm" ]]; then
+    sudo $@
+  else
+    $@
+  fi
+}
+
+anm_activate() {
+  version=$1
+
+  local install_path=$(get_anm_install_location)
+  local bin_path=$(get_bin_path)
+
+  local binary_folder="$install_path/versions/node/$version/bin"
+
+  is_sudo mkdir -p $bin_path
+
+  is_sudo ln -s $binary_folder/node $bin_path/node
+  is_sudo ln -s $binary_folder/npm $bin_path/npm
+  is_sudo ln -s $binary_folder/npx $bin_path/npx
+}
+
+anm_install() {
+  case $1 in
+    "")
+      version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "");;
+    "--lts")
+      if [[ $2 ]]; then
+        lts_name=$(echo "$2" | tr '[:upper:]' '[:lower:]')
+        version=$(latest_lts_version_number $lts_name)
       else
         version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "latest_lts")
-        download_filename="node-$version-$node_arch.tar.xz"
-        download_link=$(get_download_link $version)
-      fi
-    else
-      version=$2
-      download_filename="node-$version-$node_arch.tar.xz"
-      download_link=$(get_download_link $version)
-    fi
-    echo "Fetching nodejs version $version from:" 
-    echo "$download_link"
+      fi;;
+    *)
+      version="$2"
+  esac
 
-    wget $download_link
-
-    echo; echo "Extracting nodejs"
-    tar -xf ${download_filename}
+  if [[ $? == 1 ]]; then
+    format_red "Unable to find version: $2\n"
+    exit 1
   fi
+
+  download_filename="node-$version-$node_arch.tar.xz"
+  download_link=$(get_download_link $version)
+
+  # if ! wget -q --method=HEAD $download_link; then
+  if ! curl --output /dev/null --silent --head --fail "$download_link"; then
+    format_red "Incorrect download link for node.js version\n"
+    format_yellow "If you think this is an error, please contact dev on GitHub"
+    echo $download_link 
+    exit 1
+  fi
+
+  echo
+  echo "Downloading nodejs version: $version from"
+  echo "$download_link"; echo
+  wget -O "/tmp/$download_filename" $download_link
+
+  anm_dir=$(get_anm_install_location)
+  
+  node_install_dir="$anm_dir/versions/node/$version"
+  is_sudo mkdir -p "$node_install_dir"
+    
+  echo "Extracting nodejs to $anm_dir"
+  is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
+
+  # mkdir -p /home/$USER/.local/bin
+  # ln -s /home/$USER/.anm/versions/node/v16.15.0/bin/node /home/$USER/.local/bin/node
+  # ln -s $node_install_dir/bin/node /home/$USER/.local/bin/node
+  # ln -s $node_install_dir/bin/npm /home/$USER/.local/bin/npm
+  # ln -s $node_install_dir/bin/npx /home/$USER/.local/bin/npx
+
+  anm_activate $version
+}
+
+print_help() {
+  echo "Trust me I am helping here"
+}
+
+anm() {
+  case $1 in
+    "ls-remote")
+      shift
+      anm_ls_remote $@;;
+    "install")
+      shift
+      anm_install $@;;
+    *)
+      echo "Unknown option"
+      print_help
+      exit 1;;
+  esac
 }
 anm $@
