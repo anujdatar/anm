@@ -75,20 +75,20 @@
   if [[ $dist == "debian" ]]; then
     dependency_list="curl wget git jq python3 python3-pip"
     update="apt-get update"
-    upgrade="apt-get upgrade"
-    install="apt-get install"
+    upgrade="apt-get upgrade -y"
+    install="apt-get install -y"
     check="dpkg-query -s"
   elif [[ $dist == "fedora" ]]; then
     dependency_list="curl wget git jq python3 python3-pip"
     # update="dnf check-update"
-    upgrade="dnf upgrade"
-    install="dnf install"
+    upgrade="dnf upgrade -y"
+    install="dnf install -y"
     check="dnf list installed"
   elif [[ $dist == "arch" ]]; then
     dependency_list="curl wget git jq python3 python-pip"
     # update="pacman -Sy"
-    upgrade="pacman -Syu"
-    install="pacman -S"
+    upgrade="pacman -Syu --noconfirm"
+    install="pacman -S --noconfirm"
     check="pacman -Qi"
   fi
 
