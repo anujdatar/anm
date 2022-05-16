@@ -1,6 +1,8 @@
 
 installed
 active
+path
+versions/
 
 # environment
 .env
