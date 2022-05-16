@@ -68,7 +68,7 @@
   dist=$(get_dist)
   if [[ $? == 1 ]]; then
     echo $dist
-    text_format red "Script Error. Exiting\n"
+    format_red "Script Error. Exiting\n"
     exit 1
   fi
 
@@ -138,10 +138,13 @@
   sudo $install $not_installed
 
   if [[ $? == 1 ]]; then
-    text_format red "Dependency install unsuccessful. Exiting installation\n"
+    format_red "Dependency install unsuccessful. Exiting installation\n"
     exit 1
   fi
-  text_format green "Dependency install successful\n"
+  format_green "Dependency install successful\n"
+
+  echo; echo "Installing pip dependencies: packaging"
+  pip3 install packaging
 
   if [[ $1 == 'system' ]]; then
     echo "Installing ANM for entire system"
