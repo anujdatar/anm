@@ -184,6 +184,7 @@ anm_install() {
   echo "Extracting nodejs to $anm_dir"
   is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
 
+  echo $version | is_sudo t -a $anm_dir/installed &> /dev/null
 
   anm_activate $version
 }
