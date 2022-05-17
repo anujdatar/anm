@@ -118,7 +118,7 @@ is_sudo() {
 }
 
 anm_activate() {
-  version=$1
+  local version=$1
 
   local install_path=$(get_anm_install_location)
   local bin_path=$(get_bin_path)
@@ -133,6 +133,7 @@ anm_activate() {
 }
 
 anm_install() {
+  local version=""
   case $1 in
     "")
       version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "");;
