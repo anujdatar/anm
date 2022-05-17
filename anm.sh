@@ -75,20 +75,22 @@ get_bin_path() {
   fi
 }
 
+python_script_path=$(get_anm_install_location)/web_json_parse.py
+
 ls_all() {
-  python3 web_json_parse.py $node_dist_index $node_arch "ls_all"
+  python3 $python_script_path $node_dist_index $node_arch "ls_all"
 }
 ls_lts() {
-  python3 web_json_parse.py $node_dist_index $node_arch "ls_lts"
+  python3 $python_script_path $node_dist_index $node_arch "ls_lts"
 }
 ls_latest() {
-  python3 web_json_parse.py $node_dist_index $node_arch "ls_latest"
+  python3 $python_script_path $node_dist_index $node_arch "ls_latest"
 }
 ls_latest_lts_version_data_by_name() {
-  python3 web_json_parse.py $node_dist_index $node_arch "lts_latest_data" $1
+  python3 $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
 }
 latest_lts_version_number() {
-  python3 web_json_parse.py $node_dist_index $node_arch "lts_latest_number" $1
+  python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $1
 }
 
 anm_ls_remote() {
@@ -133,13 +135,13 @@ anm_activate() {
 anm_install() {
   case $1 in
     "")
-      version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "");;
+      version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "");;
     "--lts")
       if [[ $2 ]]; then
         lts_name=$(echo "$2" | tr '[:upper:]' '[:lower:]')
-        version=$(latest_lts_version_number $lts_name)
+        version=$(latest_version_number $lts_name)
       else
-        version=$(python3 web_json_parse.py $node_dist_index $node_arch "latest_of" "latest_lts")
+        version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")
       fi;;
     *)
       version="$2"
