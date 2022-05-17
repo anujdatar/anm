@@ -62,7 +62,7 @@
 
   ############################################################################
 
-  echo "Installing myNas to system"; echo
+  echo -e "Installing myNas to system\n\n"
 
   ### check distro and use corresponding package manager
   dist=$(get_dist)
@@ -93,14 +93,14 @@
   fi
 
   ### update and upgrade
-  echo "Updating package lists and upgrading system packages"
+  echo -e "\nUpdating package lists and upgrading system packages\n"
   if [[ $update ]]; then
     sudo $update
   fi
   sudo $upgrade
 
   ### check if dependencies are met, else install
-  echo "Checking package dependencies"
+  echo -e "\nChecking package dependencies\n"
   # dependency_list="curl wget git jq python3 python3-pip"
   not_installed=""
 
@@ -122,9 +122,9 @@
   done
 
   if [[ "$not_installed" == "" ]]; then
-    echo -e "\nDependencies OK. Proceeding ..."; echo
+    echo -e "\nDependencies OK. Proceeding ...\n"
   else
-    echo -e "Need to install missing dependencies: $not_installed"; echo
+    echo -e "Need to install missing dependencies: $not_installed \n"
     question="Would you like to install dependencies to continue? [Y]/n: "
     yes="Installing dependencies"
     no="Installation cancelled.. Bye!!"
@@ -134,7 +134,7 @@
   if [[ $? == 1 ]]; then
     exit 1
   fi
-  echo "Running: $install $not_installed"; echo
+  echo -e "\nRunning: $install $not_installed\n"
   sudo $install $not_installed
 
   if [[ $? == 1 ]]; then
@@ -143,17 +143,17 @@
   fi
   format_green "Dependency install successful\n"
 
-  echo; echo "Installing pip dependencies: packaging"
+  echo -e "\nInstalling pip dependencies: packaging\n"
   pip3 install packaging
 
   if [[ $1 == 'system' ]]; then
-    echo "Installing ANM for entire system"
+    echo -e "\nInstalling ANM for entire system\n"
     install_path="/opt/anm"
     bin_path="/usr/bin"
 
     echo "Install path = $install_path"
   else
-    echo "Installing ANM for user $USER"
+    echo -e "\nInstalling ANM for user $USER\n"
 
     install_path="/home/$USER/.anm"
     bin_path="/home/$USER/.local/bin"
@@ -173,7 +173,7 @@
 
   chmod +x ${install_path}/anm.sh
 
-  echo "Adding ANM executable symlink to bin"
+  echo -e "\nAdding ANM executable symlink to bin\n"
   is_sudo mkdir -p ${bin_path}
   is_sudo ln -s ${install_path}/anm.sh ${bin_path}/anm
 
