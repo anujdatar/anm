@@ -153,6 +153,16 @@ anm_install() {
     exit 1
   fi
 
+  anm_dir=$(get_anm_install_location)
+  node_install_dir="$anm_dir/versions/node/$version"
+
+  if [[ -d node_install_dir ]]; then
+    format_yellow "NodeJs release: $version is already installed"
+    exit 1
+  fi
+
+  is_sudo mkdir -p "$node_install_dir"
+
   download_filename="node-$version-$node_arch.tar.xz"
   download_link=$(get_download_link $version)
 
@@ -168,20 +178,10 @@ anm_install() {
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
   wget -O "/tmp/$download_filename" $download_link
-
-  anm_dir=$(get_anm_install_location)
-  
-  node_install_dir="$anm_dir/versions/node/$version"
-  is_sudo mkdir -p "$node_install_dir"
     
   echo "Extracting nodejs to $anm_dir"
   is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
 
-  # mkdir -p /home/$USER/.local/bin
-  # ln -s /home/$USER/.anm/versions/node/v16.15.0/bin/node /home/$USER/.local/bin/node
-  # ln -s $node_install_dir/bin/node /home/$USER/.local/bin/node
-  # ln -s $node_install_dir/bin/npm /home/$USER/.local/bin/npm
-  # ln -s $node_install_dir/bin/npx /home/$USER/.local/bin/npx
 
   anm_activate $version
 }
