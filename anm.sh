@@ -57,7 +57,13 @@ get_lts_download_link() {
 }
 
 get_anm_install_location() {
-  echo $(cat ./path)
+  local executable_path=$(which anm)
+
+  if [[ $executable_path == "/usr/bin/anm" ]]; then
+    echo "/opt/anm"
+  else
+    echo "/home/$USER/.anm"
+  fi
 }
 get_bin_path() {
   local install_path=$(get_anm_install_location)
