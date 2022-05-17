@@ -34,6 +34,53 @@ This should install to `/home/$USER/.anm`. It does the following things
 
 You might have to restart your system, or logout and log back in. Depends. You should be able to use anm from command line after this.
 
+## Uninstall
+Unfortunately this has to be manual for now
+  1. Remove the installed directory
+    ```
+    rm -rf /home/$USER/.anm
+    ```
+  2. Remove symlink
+    ```
+    rm /home/$USER/.local/bin/anm
+    ```
+
+## Usage
+1. List node versions available to install from www.nodejs.org
+  - List all available options
+    ```
+    anm ls-remote
+    ```
+  - List all LTS releases
+    ```
+    anm ls-remote --lts
+    ```
+  - List latest release of each version
+    ```
+    anm ls-remote --latest
+    ```
+2. Install a version of NodeJs
+  - Install the latest available release
+    ```
+    anm install
+    ```
+  - Install the latest LTS version release
+    ```
+    anm install --lts
+    ```
+  - Install the latest release of a specific LTS version
+    ```
+    anm install --lts <release name>  # gallium, fermium, argon, etc
+    ```
+  - Install a specific release by version number
+    ```
+    anm install v16.15.0
+    ```
+3. Uninstall an installed version of NodeJs
+   ```
+   anm uninstall <version number>  # v16.15.0
+   ```
+
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently. Was initially inspired by their work. But when I started this project, I had issues with NVM on some of my RockChip based SBCs. It works perfectly now, but I had a few different ideas I wanted to try out for my local servers.
 
