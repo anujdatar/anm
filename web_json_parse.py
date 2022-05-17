@@ -179,7 +179,7 @@ def print_latest_lts_version_data(data, lts_name):
     print_node_version_data(last_item)
 
 
-def print_latest_lts_version_number(data, lts_name):
+def print_latest_version_number(data, ver_name):
     """
     Get just latest version number of said LTS name
     :param data: list[dict] -> json data from node.js
@@ -189,7 +189,7 @@ def print_latest_lts_version_number(data, lts_name):
     lts_names_list = get_all_lts_names(data)
     latest_version_data = get_latest_all(nodeVersions)
 
-    if not lts_name:
+    if not ver_name:
         latest_version = {}
         for item in latest_version_data:
             if not latest_version:
@@ -197,7 +197,7 @@ def print_latest_lts_version_number(data, lts_name):
             else:
                 latest_version = version_compare(item, latest_version)
         print(latest_version['version'])
-    elif lts_name == 'latest_lts':
+    elif ver_name == 'latest_lts':
         latest_version = {}
         for item in latest_version_data:
             if item['lts']:
@@ -206,9 +206,9 @@ def print_latest_lts_version_number(data, lts_name):
                 else:
                     latest_version = version_compare(item, latest_version)
         print(latest_version['version'])
-    elif lts_name.lower() in lts_names_list:
+    elif ver_name.lower() in lts_names_list:
         for item in latest_version_data:
-            if lts_name.capitalize() == item['lts']:
+            if ver_name.capitalize() == item['lts']:
                 print(item['version'])
     else:
         print('Unknown node lts version')
@@ -232,5 +232,5 @@ if __name__ == '__main__':
                 print_latest_all(nodeVersions)
             elif sys.argv[3] == 'lts_latest_data':
                 print_latest_lts_version_data(nodeVersions, sys.argv[4])
-            elif sys.argv[3] == 'lts_latest_number':
-                print_latest_lts_version_number(nodeVersions, sys.argv[4])
+            elif sys.argv[3] == 'latest_version_number':
+                print_latest_version_number(nodeVersions, sys.argv[4])
