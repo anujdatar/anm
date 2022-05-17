@@ -130,6 +130,8 @@ anm_activate() {
   is_sudo ln -s $binary_folder/node $bin_path/node
   is_sudo ln -s $binary_folder/npm $bin_path/npm
   is_sudo ln -s $binary_folder/npx $bin_path/npx
+
+  echo $version | is_sudo t -a $anm_dir/active &> /dev/null
 }
 
 anm_install() {
