@@ -181,5 +181,5 @@
   is_sudo touch ${install_path}/active
   is_sudo touch ${install_path}/installed
   
-  echo $install_path | is_sudo tee $install_path/path &> /dev/null
+  # echo $install_path | is_sudo tee $install_path/path &> /dev/null
 }
