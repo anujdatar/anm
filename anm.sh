@@ -203,6 +203,14 @@ anm_uninstall() {
     echo "Node version: $version not installed"
     exit 1
   fi
+
+  local current_installed=$(cat $install_path/installed)
+  local final_list=""
+  for installed in $current_installed; do
+    if [[ $installed != $version ]]; then
+      final_list="$final_list $installed"
+    fi
+  done
 }
 
 print_help() {
