@@ -156,7 +156,7 @@ anm_install() {
   # if ! wget -q --method=HEAD $download_link; then
   if ! curl --output /dev/null --silent --head --fail "$download_link"; then
     format_red "Incorrect download link for node.js version\n"
-    format_yellow "If you think this is an error, please contact dev on GitHub"
+    format_yellow "If you think this is an error, please contact dev on GitHub\n"
     echo $download_link 
     exit 1
   fi
