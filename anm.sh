@@ -69,7 +69,7 @@ get_anm_install_location() {
 }
 get_bin_path() {
   local install_path=$(get_anm_install_location)
-  
+
   if [[ $install_path == "/opt/anm" ]]; then
     echo "/usr/bin"
   else
@@ -108,6 +108,20 @@ anm_ls_remote() {
     "")
       ls_all;;
   esac
+}
+
+anm_ls() {
+  local install_path=$(get_anm_install_location)
+  local current_installed=$(cat $install_path/installed | sort -V -r)
+  local current_active=$(cat $install_path/active)
+
+  for installed in $current_installed; do
+    if [[ $installed == $current_active ]]; then
+      format_green "$installed"; echo " (active)"
+    else
+      echo $installed
+    fi
+  done
 }
 
 is_sudo() {
@@ -174,7 +188,7 @@ anm_install() {
   if ! curl --output /dev/null --silent --head --fail "$download_link"; then
     format_red "Incorrect download link for node.js version\n"
     format_yellow "If you think this is an error, please contact dev on GitHub\n"
-    echo $download_link 
+    echo $download_link
     exit 1
   fi
 
@@ -182,7 +196,7 @@ anm_install() {
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
   wget -O "/tmp/$download_filename" $download_link
-    
+
   echo "Extracting nodejs to $anm_dir"
   is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
 
@@ -221,6 +235,8 @@ print_help() {
 
 anm() {
   case $1 in
+    "ls")
+      anm_ls;;
     "ls-remote")
       shift
       anm_ls_remote $@;;
