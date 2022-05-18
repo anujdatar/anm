@@ -1,6 +1,6 @@
 # Another Node Manager
 
-![version](https://img.shields.io/github/v/release/anujdatar/anm)
+![version](https://img.shields.io/github/v/tag/anujdatar/anm?label=version&sort=semver)
 
 **DISCLAIMER**: Still kinda beta, I am still tweaking and updating scripts.
 Not ready for production just yet. Basic functionality has been tested and is
