@@ -64,39 +64,40 @@ Unfortunately this has to be manual for now
    anm ls
    ```
 2. List node versions available to install from www.nodejs.org
-  - List all available options
-    ```
-    anm ls-remote
-    ```
-  - List all LTS releases
-    ```
-    anm ls-remote --lts
-    ```
-  - List latest release of each version
-    ```
-    anm ls-remote --latest
-    ```
-2. Install a version of NodeJs
-  - Install the latest available release
-    ```
-    anm install
-    ```
-  - Install the latest LTS version release
-    ```
-    anm install --lts
-    ```
-  - Install the latest release of a specific LTS version
-    ```
-    anm install --lts <release name>  # gallium, fermium, argon, etc
-    ```
-  - Install a specific release by version number
-    ```
-    anm install v16.15.0
-    ```
-3. Uninstall an installed version of NodeJs
+     - List all available options
+       ```
+       anm ls-remote
+       ```
+     - List all LTS releases
+       ```
+       anm ls-remote --lts
+       ```
+     - List latest release of each version
+       ```
+       anm ls-remote --latest
+       ```
+3. Install a version of NodeJs
+     - Install the latest available release
+       ```
+       anm install
+       ```
+     - Install the latest LTS version release
+       ```
+       anm install --lts
+       ```
+     - Install the latest release of a specific LTS version
+       ```
+       anm install --lts <release name>  # gallium, fermium, argon, etc
+       ```
+     - Install a specific release by version number
+       ```
+       anm install v16.15.0
+       ```
+4. Uninstall an installed version of NodeJs
    ```
    anm uninstall <version number>  # v16.15.0
    ```
+5. Other misc. commands are basically `anm -help` and `anm --version`
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.
