@@ -245,6 +245,7 @@ anm_uninstall() {
       final_list="$final_list $installed"
     fi
   done
+  echo $final_list | is_sudo tee $install_path/installed &> /dev/null
 }
 
 print_help() {
