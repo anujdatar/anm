@@ -135,6 +135,20 @@ is_sudo() {
   fi
 }
 
+anm_deactivate() {
+  local bin_path=$(get_bin_path)
+
+  if [[ -f $bin_path/node ]]; then
+    rm $bin_path/node
+  fi
+  if [[ -f $bin_path/npm ]]; then
+    rm $bin_path/npm
+  fi
+  if [[ -f $bin_path/npx ]]; then
+    rm $bin_path/npx
+  fi
+}
+
 anm_activate() {
   local version=$1
 
@@ -144,6 +158,8 @@ anm_activate() {
   local binary_folder="$install_path/versions/node/$version/bin"
 
   is_sudo mkdir -p $bin_path
+
+  anm_deactivate
 
   is_sudo ln -s $binary_folder/node $bin_path/node
   is_sudo ln -s $binary_folder/npm $bin_path/npm
