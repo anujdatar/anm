@@ -228,6 +228,7 @@ anm_uninstall() {
 
   local install_path=$(get_anm_install_location)
   local bin_path=$(get_bin_path)
+  local current_active=$(cat $install_path/active)
 
   if [[ -d $install_path/versions/node/$version ]]; then
     echo "Uninstalling node version: $version"
@@ -246,6 +247,13 @@ anm_uninstall() {
     fi
   done
   echo $final_list | is_sudo tee $install_path/installed &> /dev/null
+
+  if [[ $current_active == $version ]]; then
+    is_sudo tee "" $install_path/active &> /dev/null
+  fi
+
+  echo "Uninstall complete. Please activate a different version of NodeJs if installed"
+  echo "anm use <version number>    # v16.15.0, v12.22.12, etc"
 }
 
 print_help() {
