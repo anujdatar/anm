@@ -1,8 +1,10 @@
 # Another Node Manager
 
-**DISCLAIMER**: Still pre-alpha, I am still tweaking and updating scripts.
-Please *DO NOT USE* just yet. I will update once basic functionality is tested
-and is error free.
+![version](https://img.shields.io/github/v/release/anujdatar/anm)
+
+**DISCLAIMER**: Still kinda beta, I am still tweaking and updating scripts.
+Not ready for production just yet. Basic functionality has been tested and is
+working fine on Ubuntu on X86_64 and ARM64. Still need to test on other platforms. Will update soon.
 
 A simple and lightweight alternative to
 [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Also works for ARM
