@@ -136,16 +136,25 @@ is_sudo() {
 }
 
 anm_deactivate() {
+  local version=$1
+
+  local install_path=$(get_anm_install_location)
+  local current_active=$(cat $install_path/active)
   local bin_path=$(get_bin_path)
 
-  if [[ -f $bin_path/node ]]; then
-    rm $bin_path/node
-  fi
-  if [[ -f $bin_path/npm ]]; then
-    rm $bin_path/npm
-  fi
-  if [[ -f $bin_path/npx ]]; then
-    rm $bin_path/npx
+  if [[ $current_active == $version ]]; then
+
+    is_sudo tee "" $install_path/active &> /dev/null
+
+    if [[ -f $bin_path/node ]]; then
+      is_sudo rm $bin_path/node
+    fi
+    if [[ -f $bin_path/npm ]]; then
+      is_sudo  rm $bin_path/npm
+    fi
+    if [[ -f $bin_path/npx ]]; then
+      is_sudo rm $bin_path/npx
+    fi
   fi
 }
 
@@ -159,7 +168,7 @@ anm_activate() {
 
   is_sudo mkdir -p $bin_path
 
-  anm_deactivate
+  anm_deactivate $version
 
   is_sudo ln -s $binary_folder/node $bin_path/node
   is_sudo ln -s $binary_folder/npm $bin_path/npm
@@ -227,12 +236,13 @@ anm_uninstall() {
   local version=$1
 
   local install_path=$(get_anm_install_location)
+  # local current_active=$(cat $install_path/active)
   local bin_path=$(get_bin_path)
-  local current_active=$(cat $install_path/active)
 
   if [[ -d $install_path/versions/node/$version ]]; then
     echo "Uninstalling node version: $version"
-    is_sudo rm $bin_path/node $bin_path/npm $bin_path/npx
+    # is_sudo rm $bin_path/node $bin_path/npm $bin_path/npx
+    anm_deactivate
     is_sudo rm -rf $install_path/versions/node/$version
   else
     echo "Node version: $version not installed"
@@ -248,9 +258,9 @@ anm_uninstall() {
   done
   echo $final_list | is_sudo tee $install_path/installed &> /dev/null
 
-  if [[ $current_active == $version ]]; then
-    is_sudo tee "" $install_path/active &> /dev/null
-  fi
+  # if [[ $current_active == $version ]]; then
+  #   is_sudo tee "" $install_path/active &> /dev/null
+  # fi
 
   echo "Uninstall complete. Please activate a different version of NodeJs if installed"
   echo "anm use <version number>    # v16.15.0, v12.22.12, etc"
