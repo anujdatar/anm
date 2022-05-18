@@ -165,7 +165,7 @@ anm_activate() {
   is_sudo ln -s $binary_folder/npm $bin_path/npm
   is_sudo ln -s $binary_folder/npx $bin_path/npx
 
-  echo $version | is_sudo tee -a $install_path/active &> /dev/null
+  echo $version | is_sudo tee $install_path/active &> /dev/null
 }
 
 anm_install() {
