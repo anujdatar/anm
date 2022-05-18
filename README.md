@@ -101,7 +101,10 @@ Unfortunately this has to be manual for now
    ```
    anm uninstall <version number>  # v16.15.0
    ```
-5. Other misc. commands are basically `anm -help` and `anm --version`
+5. Use a particular version of NodeJs
+   ```
+   anm use <version number>  # v16.15.0
+6. Other misc. commands are basically `anm -help` and `anm --version`
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.

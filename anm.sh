@@ -248,6 +248,8 @@ print_help() {
   echo "                              # gallium, fermium, erbium, etc"; echo
   echo "    anm uninstall <version>   # Uninstall a specific version of NodeJs"
   echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"; echo
+  echo "    anm use <version>         # Activate or use a particular version of NodeJs"
+  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"; echo
   echo "    anm --version             # Print version of ANM locally installed"
   echo "    anm --help                # Print this help message"
   echo
