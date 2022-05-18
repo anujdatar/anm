@@ -266,6 +266,9 @@ anm() {
     "uninstall")
       shift
       anm_uninstall $@;;
+    "use")
+      shift
+      anm_activate $@;;
     "--version")
       echo $ANM_VERSION;;
     "--help")
