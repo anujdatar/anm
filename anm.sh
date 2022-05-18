@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ANM_VERSION="1.0.0"
+
 node_dist_index="https://nodejs.org/dist/index.json"
 
 # some text color formatting functions
@@ -246,6 +248,10 @@ anm() {
     "uninstall")
       shift
       anm_uninstall $@;;
+    "--version")
+      echo $ANM_VERSION;;
+    "--help")
+      print_help;;
     *)
       echo "Unknown option"
       print_help
