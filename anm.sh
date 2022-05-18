@@ -232,7 +232,25 @@ anm_uninstall() {
 }
 
 print_help() {
-  echo "Trust me I am helping here"
+  echo; echo "Another Node Manager ($ANM_VERSION)"
+  echo "Usage: anm [command] [options...]"; echo
+  echo "    anm ls                    # List locally installed NodeJs versions"; echo
+  echo "    anm ls-remote             # List node versions available for install from www.nodejs.org"
+  echo "        --lts                 # List LTS versions of node available for install"
+  echo "        --lts <version>       # List latest LTS release for a version that is available for install"
+  echo "                              # gallium, fermium, erbium, etc"
+  echo "        --latest              # List latest release for all node versions available for install"; echo
+  echo "    anm install               # Install latest release of NodeJs"
+  echo "        <version number>      # Install a perticular version of NodeJs"
+  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"
+  echo "        --lts                 # Install latest LTS release of NodeJs"
+  echo "        --lts <version>       # Install latest LTS release of a version of NodeJs"
+  echo "                              # gallium, fermium, erbium, etc"; echo
+  echo "    anm uninstall <version>   # Uninstall a specific version of NodeJs"
+  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"; echo
+  echo "    anm --version             # Print version of ANM locally installed"
+  echo "    anm --help                # Print this help message"
+  echo
 }
 
 anm() {
