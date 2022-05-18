@@ -104,7 +104,16 @@ Unfortunately this has to be manual for now
 5. Use a particular version of NodeJs
    ```
    anm use <version number>  # v16.15.0
-6. Other misc. commands are basically `anm -help` and `anm --version`
+6. Other misc. commands
+    ```
+    anm --version    # print version of ANM that is installed
+    ```
+    ```
+    anm --path       # print path where ANM is installed, NodeJs binaries in a subfolder here
+    ```
+    ```
+    anm --help       # print help message
+    ```
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.
