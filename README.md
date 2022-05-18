@@ -63,7 +63,7 @@ Unfortunately this has to be manual for now
    ```
    anm ls
    ```
-2. List node versions available to install from www.nodejs.org
+2. List node versions available for install from www.nodejs.org
      - List all available options
        ```
        anm ls-remote
@@ -71,6 +71,10 @@ Unfortunately this has to be manual for now
      - List all LTS releases
        ```
        anm ls-remote --lts
+       ```
+     - List latest LTS release for a particular version
+       ```
+       anm ls-remote --lts <release name>  # gallium, fermium, argon, etc
        ```
      - List latest release of each version
        ```
