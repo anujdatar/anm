@@ -59,7 +59,11 @@ Unfortunately this has to be manual for now
     ```
 
 ## Usage
-1. List node versions available to install from www.nodejs.org
+1. List locally installed node versions / releases. Should tell you active version as well.
+   ```
+   anm ls
+   ```
+2. List node versions available to install from www.nodejs.org
   - List all available options
     ```
     anm ls-remote
