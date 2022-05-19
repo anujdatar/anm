@@ -143,16 +143,19 @@ anm_deactivate() {
   local bin_path=$(get_bin_path)
 
   if [[ $current_active == $version ]]; then
-
+    echo "Deactivating current version of NodeJs: $version"
     is_sudo tee "" $install_path/active &> /dev/null
 
     if [[ -f $bin_path/node ]]; then
+      echo "Deleting node from bin"
       is_sudo rm $bin_path/node
     fi
     if [[ -f $bin_path/npm ]]; then
+      echo "Deleting npm from bin"
       is_sudo  rm $bin_path/npm
     fi
     if [[ -f $bin_path/npx ]]; then
+      echo "Deleting npx from bin"
       is_sudo rm $bin_path/npx
     fi
   fi
@@ -169,6 +172,7 @@ anm_activate() {
   is_sudo mkdir -p $bin_path
 
   anm_deactivate $version
+  echo "Activating NodeJs version: $version"
 
   is_sudo ln -s $binary_folder/node $bin_path/node
   is_sudo ln -s $binary_folder/npm $bin_path/npm
