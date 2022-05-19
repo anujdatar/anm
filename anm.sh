@@ -138,6 +138,11 @@ is_sudo() {
 anm_deactivate() {
   local version=$1
 
+  if [[ $version == "" ]]; then
+    echo No version active currently
+    return 0
+  fi
+
   local install_path=$(get_anm_install_location)
   local current_active=$(cat $install_path/active)
   local bin_path=$(get_bin_path)
@@ -167,18 +172,23 @@ anm_activate() {
   local install_path=$(get_anm_install_location)
   local bin_path=$(get_bin_path)
 
+  local current_active=$(cat $install_path/active)
+
   local binary_folder="$install_path/versions/node/$version/bin"
 
   is_sudo mkdir -p $bin_path
 
-  anm_deactivate $version
+  anm_deactivate $current_active
+
   echo "Activating NodeJs version: $version"
 
   is_sudo ln -s $binary_folder/node $bin_path/node
   is_sudo ln -s $binary_folder/npm $bin_path/npm
   is_sudo ln -s $binary_folder/npx $bin_path/npx
 
-  echo $version | is_sudo tee $install_path/active &> /dev/null
+  if [[ $? != 1 ]]; then
+    echo $version | is_sudo tee $install_path/active &> /dev/null
+  fi
 }
 
 anm_install() {
@@ -228,7 +238,7 @@ anm_install() {
   echo "$download_link"; echo
   wget -O "/tmp/$download_filename" $download_link
 
-  echo "Extracting nodejs to $anm_dir"
+  echo "Extracting nodejs to $node_install_dir"
   is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
 
   echo $version | is_sudo tee -a $anm_dir/installed &> /dev/null
@@ -246,7 +256,7 @@ anm_uninstall() {
   if [[ -d $install_path/versions/node/$version ]]; then
     echo "Uninstalling node version: $version"
     # is_sudo rm $bin_path/node $bin_path/npm $bin_path/npx
-    anm_deactivate
+    anm_deactivate $version
     is_sudo rm -rf $install_path/versions/node/$version
   else
     echo "Node version: $version not installed"
