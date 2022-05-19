@@ -2,7 +2,7 @@
 {
   # enclosing everything in braces to ensure entire file is downloaded
   # and intact, so there are no errors on first download/install
-  
+
   # utility function for this
   # some text color formatting functions
   format_red() {
@@ -40,7 +40,7 @@
     local question="$1"
     local yes="$2"
     local no="$3"
-    
+
     while true; do
       read -p "$question"
 
@@ -62,7 +62,7 @@
 
   ############################################################################
 
-  echo -e "Installing myNas to system\n\n"
+  echo -e "Installing ANM to system\n\n"
 
   ### check distro and use corresponding package manager
   dist=$(get_dist)
@@ -180,6 +180,6 @@
   is_sudo mkdir -p ${install_path}/versions/node
   is_sudo touch ${install_path}/active
   is_sudo touch ${install_path}/installed
-  
+
   # echo $install_path | is_sudo tee $install_path/path &> /dev/null
 }
