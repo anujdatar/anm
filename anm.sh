@@ -149,7 +149,7 @@ anm_deactivate() {
 
   if [[ $current_active == $version ]]; then
     echo "Deactivating current version of NodeJs: $version"
-    is_sudo tee "" $install_path/active &> /dev/null
+    echo "" | is_sudo tee "" $install_path/active &> /dev/null
 
     if [[ -f $bin_path/node ]]; then
       echo "Deleting node from bin"
