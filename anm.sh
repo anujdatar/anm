@@ -152,15 +152,12 @@ anm_deactivate() {
     echo "" | is_sudo tee "" $install_path/active &> /dev/null
 
     if [[ -f $bin_path/node ]]; then
-      echo "Deleting node from bin"
       is_sudo rm $bin_path/node
     fi
     if [[ -f $bin_path/npm ]]; then
-      echo "Deleting npm from bin"
       is_sudo  rm $bin_path/npm
     fi
     if [[ -f $bin_path/npx ]]; then
-      echo "Deleting npx from bin"
       is_sudo rm $bin_path/npx
     fi
   fi
