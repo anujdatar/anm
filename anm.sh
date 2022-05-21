@@ -199,7 +199,7 @@ anm_install() {
     "--lts")
       if [[ $2 ]]; then
         lts_name=$(echo "$2" | tr '[:upper:]' '[:lower:]')
-        version=$(latest_version_number $lts_name)
+        version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)
       else
         version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")
       fi;;
