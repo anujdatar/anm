@@ -103,10 +103,15 @@ Unfortunately this has to be manual for now
    ```
    anm uninstall <version number>  # v16.15.0
    ```
-5. Use a particular version of NodeJs
+5. Use a particular version of NodeJs, if you already have a few installed
    ```
    anm use <version number>  # v16.15.0
-6. Other misc. commands
+   ```
+6. Deactivate a currently installed version of NodeJs if managed by ANM
+   ```
+   anm deactivate <version number>  # v16.15.0
+   ```
+7. Other misc. commands
     ```
     anm --version    # print version of ANM that is installed
     ```
@@ -116,6 +121,10 @@ Unfortunately this has to be manual for now
     ```
     anm --help       # print help message
     ```
+
+## TODO:
+1. Look into aliasing installed node versions
+2. Remove the need to write node versions starting with v.
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.
