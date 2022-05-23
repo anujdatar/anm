@@ -171,7 +171,7 @@
 
   is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
 
-  chmod +x ${install_path}/anm.sh
+  is_sudo chmod +x ${install_path}/anm.sh
 
   echo -e "\nAdding ANM executable symlink to bin\n"
   is_sudo mkdir -p ${bin_path}
