@@ -31,7 +31,18 @@ curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
 ```
 wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
 ```
+
 This should install to `/home/$USER/.anm`.
+
+If you want to install ANM system-wide, for all users. Use the following:
+```
+curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
+```
+```
+wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
+```
+This should install to /opt/anm.
+> NOTE: most ANM actions, and node (npm install -g) will require `sudo` privileges.
 
 The convenience script does the following in case you want to install manually.
   1. Update/upgrade system
