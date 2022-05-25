@@ -32,6 +32,15 @@ get_sys_node_arch() {
   esac
 }
 
+parse_version() {
+  local version_1=$1
+
+  if [[ $version_1 == v* ]]; then
+    echo "$version_1"
+  else
+    echo "v$version_1"
+  fi
+}
 get_sys_node_arch
 if [[ $? == 1 ]]; then
   format_red "System OS and architecture not supported by ANM\n"
