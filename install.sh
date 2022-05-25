@@ -19,7 +19,6 @@
   get_dist() {
     ### Usage: get_dist ####
     local filename="/etc/os-release"
-    # filename="./os-release.txt"  # local copy of /etc/os-release for testing
 
     if [[ $(grep -i fedora $filename) ]]; then
       echo "fedora"
@@ -46,11 +45,9 @@
 
       case $REPLY in
         ""|[Yy]|[Yy][Ee][Ss]) # blank or y or yes, any case
-          # eval $yes
           echo $yes
           break;;
         [Nn]|[Nn][Oo]) # n or no, any case
-          # eval $no
           echo $no
           return 1
           break;;
@@ -80,13 +77,11 @@
     check="dpkg-query -s"
   elif [[ $dist == "fedora" ]]; then
     dependency_list="curl wget git jq python3 python3-pip"
-    # update="dnf check-update"
     upgrade="dnf upgrade -y"
     install="dnf install -y"
     check="dnf list installed"
   elif [[ $dist == "arch" ]]; then
     dependency_list="curl wget git jq python3 python-pip"
-    # update="pacman -Sy"
     upgrade="pacman -Syu --noconfirm"
     install="pacman -S --noconfirm"
     check="pacman -Qi"
@@ -168,19 +163,16 @@
         RC_FILE="$HOME/.profile"
       fi
 
-      MESSAGE=$(printf "%s\n" 'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then\n'\
-      'PATH="$HOME/.local/bin:$PATH"\n'\
-      'fi\n'\
-      'export PATH\n')
+      MESSAGE=$(printf "%s\n" '# User specific environment\n'\
+        'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then\n'\
+        'PATH="$HOME/.local/bin:$PATH"\n'\
+        'fi\n'\
+        'export PATH\n'
+      )
 
-      # echo 'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then' >> $RC_FILE
-      # echo 'PATH="$HOME/.local/bin:$PATH"' >> $RC_FILE
-      # echo 'fi' >> $RC_FILE
-      # echo 'export PATH' >> $RC_FILE
-
-      echo "Adding $HOME/.local/bin to path using $RC_FILE"
+      echo "Adding $HOME/.local/bin to path, adding the following to $RC_FILE"
+      format_yellow $MESSAGE; echo
       echo "Works for Bash, Zsh. Please add $HOME/.profile to you rc file for other shells"
-      echo -e $MESSAGE
 
       echo -e $MESSAGE >> $RC_FILE
     fi
@@ -205,6 +197,4 @@
   is_sudo mkdir -p ${install_path}/versions/node
   is_sudo touch ${install_path}/active
   is_sudo touch ${install_path}/installed
-
-  # echo $install_path | is_sudo tee $install_path/path &> /dev/null
 }
