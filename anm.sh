@@ -41,6 +41,7 @@ parse_version() {
     echo "v$version_1"
   fi
 }
+
 get_sys_node_arch
 if [[ $? == 1 ]]; then
   format_red "System OS and architecture not supported by ANM\n"
@@ -49,19 +50,21 @@ if [[ $? == 1 ]]; then
 fi
 
 get_download_link() {
+  local version=$(parse_version $1)
   if [[ $1 == "" ]]; then
     format_red "No node version provided for download\n"
     exit 1
   fi
   local base_link="https://nodejs.org/dist"
-  local version_page="$base_link/$1"
+  local version_page="$base_link/$version"
   local download_filename="node-$1-$node_arch.tar.xz"
   local download_link="$version_page/$download_filename"
   echo $download_link
 }
 get_lts_download_link() {
+  local version=$(parse_version $1)
   local base_link="https://nodejs.org/dist"
-  local version_page="$base_link/latest-$1"
+  local version_page="$base_link/latest-$version"
   local download_filename="node-$2-$node_arch.tar.xz"
   local download_link="$version_page/$download_filename"
   echo $download_link
@@ -145,7 +148,7 @@ is_sudo() {
 }
 
 anm_deactivate() {
-  local version=$1
+  local version=$(parse_version $1)
 
   if [[ $version == "" ]]; then
     echo No version passed to deactivate
@@ -173,7 +176,7 @@ anm_deactivate() {
 }
 
 anm_activate() {
-  local version=$1
+  local version=$(parse_version $1)
 
   local install_path=$(get_anm_install_location)
   local bin_path=$(get_bin_path)
@@ -215,7 +218,7 @@ anm_install() {
         version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")
       fi;;
     *)
-      version="$1"
+      version=$(parse_version $1)
   esac
 
   if [[ $? == 1 ]]; then
@@ -258,7 +261,7 @@ anm_install() {
 }
 
 anm_uninstall() {
-  local version=$1
+  local version=$(parse_version $1)
 
   local install_path=$(get_anm_install_location)
   # local current_active=$(cat $install_path/active)
