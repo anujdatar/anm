@@ -101,7 +101,6 @@
 
   ### check if dependencies are met, else install
   echo -e "\nChecking package dependencies\n"
-  # dependency_list="curl wget git jq python3 python3-pip"
   not_installed=""
 
   for pkg in $dependency_list; do
