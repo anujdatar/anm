@@ -166,6 +166,13 @@ fi
     bin_path="/home/$USER/.local/bin"
 
     echo "Install path = $install_path"
+
+    if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then
+      echo 'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then' >> $RC_FILE
+      echo 'PATH="$HOME/.local/bin:$PATH"' >> $RC_FILE
+      echo 'fi' >> $RC_FILE
+      echo 'export PATH' >> $RC_FILE
+    fi
   fi
 
   is_sudo() {
