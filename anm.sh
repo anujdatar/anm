@@ -305,14 +305,14 @@ print_help() {
   echo "        --latest              # List latest release for all node versions available for install"; echo
   echo "    anm install               # Install latest release of NodeJs"
   echo "        <version number>      # Install a perticular version of NodeJs"
-  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"
+  echo "                              # v18.2.0, v17.9.0, 12.22.12, etc. v-prefix not necessary"
   echo "        --lts                 # Install latest LTS release of NodeJs"
   echo "        --lts <version>       # Install latest LTS release of a version of NodeJs"
   echo "                              # gallium, fermium, erbium, etc"; echo
   echo "    anm uninstall <version>   # Uninstall a specific version of NodeJs"
-  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"; echo
+  echo "                              # v18.2.0, v17.9.0, 12.22.12, etc. v-prefix not necessary"; echo
   echo "    anm use <version>         # Activate or use a particular version of NodeJs"
-  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc"; echo
+  echo "                              # v18.2.0, v17.9.0, v12.22.12, etc. v-prefix not necessary"; echo
   echo "    anm deactivate <version>  # Deactivate an active version of NodeJs if installed with ANM"
   echo "    anm --version             # Print version of ANM locally installed"
   echo "    anm --path                # Print ANM install path, NodeJs binaries stored here as well"

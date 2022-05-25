@@ -108,19 +108,19 @@ Unfortunately this has to be manual for now
        ```
      - Install a specific release by version number
        ```
-       anm install v16.15.0
+       anm install v16.15.0 # or 18.2.0, v-prefix not necessary
        ```
 4. Uninstall an installed version of NodeJs
    ```
-   anm uninstall <version number>  # v16.15.0
+   anm uninstall <version number>  # v16.15.0 or 14.19.3, v-prefix not necessary
    ```
 5. Use a particular version of NodeJs, if you already have a few installed
    ```
-   anm use <version number>  # v16.15.0
+   anm use <version number>  # v16.15.0 or 18.2.0, v-prefix not necessary
    ```
 6. Deactivate a currently installed version of NodeJs if managed by ANM
    ```
-   anm deactivate <version number>  # v16.15.0
+   anm deactivate <version number>  # v16.15.0 or 18.2.0, v-prefix not necessary
    ```
 7. Other misc. commands
     ```
@@ -135,7 +135,6 @@ Unfortunately this has to be manual for now
 
 ## TODO:
 1. Look into aliasing installed node versions
-2. Remove the need to write node versions starting with v.
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.
