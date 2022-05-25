@@ -62,6 +62,14 @@
 
   ############################################################################
 
+if [[ "$SHELL" == "bash" ]]; then
+  RC_FILE="$HOME/.bashrc"
+elif [[ "$SHELL" == "zsh" ]]; then
+  RC_FILE="$HOME/.zshrc"
+else
+  RC_FILE="$HOME/.profile"
+fi
+
   echo -e "Installing ANM to system\n\n"
 
   ### check distro and use corresponding package manager
