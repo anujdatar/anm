@@ -206,7 +206,7 @@ anm_install() {
         version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")
       fi;;
     *)
-      version="$2"
+      version="$1"
   esac
 
   if [[ $? == 1 ]]; then
