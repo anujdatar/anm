@@ -87,8 +87,8 @@
   elif [[ $dist == "arch" ]]; then
     dependency_list="curl wget git jq python3 python-pip"
     # update="pacman -Sy"
-    upgrade="pacman -Syyu"
-    install="pacman -Sy"
+    upgrade="pacman -Syu --noconfirm"
+    install="pacman -S --noconfirm"
     check="pacman -Qi"
   fi
 
