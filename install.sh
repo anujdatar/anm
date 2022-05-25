@@ -62,9 +62,9 @@
 
   ############################################################################
 
-if [[ "$SHELL" == "bash" ]]; then
-  RC_FILE="$HOME/.bashrc"
-elif [[ "$SHELL" == "zsh" ]]; then
+if [[ "bash" =~ "$SHELL" ]]; then
+  RC_FILE="$HOME"/.bash"rc"
+elif [[ "zsh" =~ "$SHELL" ]]; then
   RC_FILE="$HOME/.zshrc"
 else
   RC_FILE="$HOME/.profile"
