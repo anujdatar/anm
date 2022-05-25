@@ -62,14 +62,6 @@
 
   ############################################################################
 
-if [[ "bash" =~ "$SHELL" ]]; then
-  RC_FILE="$HOME"/.bash"rc"
-elif [[ "zsh" =~ "$SHELL" ]]; then
-  RC_FILE="$HOME/.zshrc"
-else
-  RC_FILE="$HOME/.profile"
-fi
-
   echo -e "Installing ANM to system\n\n"
 
   ### check distro and use corresponding package manager
@@ -168,10 +160,29 @@ fi
     echo "Install path = $install_path"
 
     if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then
-      echo 'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then' >> $RC_FILE
-      echo 'PATH="$HOME/.local/bin:$PATH"' >> $RC_FILE
-      echo 'fi' >> $RC_FILE
-      echo 'export PATH' >> $RC_FILE
+      if [[ "$SHELL" =~ "bash" ]]; then
+        RC_FILE="$HOME/.bashrc"
+      elif [[ "$SHELL" =~ "zsh" ]]; then
+        RC_FILE="$HOME/.zshrc"
+      else
+        RC_FILE="$HOME/.profile"
+      fi
+
+      MESSAGE=$(printf "%s\n" 'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then\n'\
+      'PATH="$HOME/.local/bin:$PATH"\n'\
+      'fi\n'\
+      'export PATH\n')
+
+      # echo 'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then' >> $RC_FILE
+      # echo 'PATH="$HOME/.local/bin:$PATH"' >> $RC_FILE
+      # echo 'fi' >> $RC_FILE
+      # echo 'export PATH' >> $RC_FILE
+
+      echo "Adding $HOME/.local/bin to path using $RC_FILE"
+      echo "Works for Bash, Zsh. Please add $HOME/.profile to you rc file for other shells"
+      echo -e $MESSAGE
+
+      echo -e $MESSAGE >> $RC_FILE
     fi
   fi
 
