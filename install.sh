@@ -128,19 +128,19 @@
     yes="Installing dependencies"
     no="Installation cancelled.. Bye!!"
     yes_no_prompt "$question" "$yes" "$no"
-  fi
 
-  if [[ $? == 1 ]]; then
-    exit 1
-  fi
-  echo -e "\nRunning: $install $not_installed\n"
-  sudo $install $not_installed
+    if [[ $? == 1 ]]; then
+      exit 1
+    fi
+    echo -e "\nRunning: $install $not_installed\n"
+    sudo $install $not_installed
 
-  if [[ $? == 1 ]]; then
-    format_red "Dependency install unsuccessful. Exiting installation\n"
-    exit 1
+    if [[ $? == 1 ]]; then
+      format_red "Dependency install unsuccessful. Exiting installation\n"
+      exit 1
+    fi
+    format_green "Dependency install successful\n"
   fi
-  format_green "Dependency install successful\n"
 
   echo -e "\nInstalling pip dependencies: packaging\n"
   pip3 install packaging
