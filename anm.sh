@@ -173,6 +173,11 @@ anm_activate() {
 
   local binary_folder="$install_path/versions/node/$version/bin"
 
+  if ! [[ -d "$install_path/versions/node/$version" ]]; then
+    format_red "Version $version not installed"
+    exit 1
+  fi
+
   is_sudo mkdir -p $bin_path
 
   anm_deactivate $current_active
