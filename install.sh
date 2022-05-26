@@ -146,6 +146,7 @@
     bin_path="/usr/bin"
 
     echo "Install path = $install_path"
+    RC_FILE="/etc/profile.d/anm_profile.sh"
   else
     echo -e "\nInstalling ANM for user $USER\n"
 
