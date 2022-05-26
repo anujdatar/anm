@@ -179,7 +179,7 @@
   fi
 
   is_sudo() {
-    if [[ $install_path =~ "$HOME" ]]; then
+    if [[ -w "$(dirname -- $install_path)" ]]; then
       $@
     else
       sudo $@
