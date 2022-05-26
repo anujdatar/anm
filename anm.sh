@@ -61,14 +61,6 @@ get_download_link() {
   local download_link="$version_page/$download_filename"
   echo $download_link
 }
-get_lts_download_link() {
-  local version=$(parse_version $1)
-  local base_link="https://nodejs.org/dist"
-  local version_page="$base_link/latest-$version"
-  local download_filename="node-$2-$node_arch.tar.xz"
-  local download_link="$version_page/$download_filename"
-  echo $download_link
-}
 
 get_anm_install_location() {
   local executable_path=$(which anm)
@@ -264,12 +256,10 @@ anm_uninstall() {
   local version=$(parse_version $1)
 
   local install_path=$(get_anm_install_location)
-  # local current_active=$(cat $install_path/active)
   local bin_path=$(get_bin_path)
 
   if [[ -d $install_path/versions/node/$version ]]; then
     echo "Uninstalling node version: $version"
-    # is_sudo rm $bin_path/node $bin_path/npm $bin_path/npx
     anm_deactivate $version
     is_sudo rm -rf $install_path/versions/node/$version
   else
@@ -285,10 +275,6 @@ anm_uninstall() {
     fi
   done
   echo $final_list | is_sudo tee $install_path/installed &> /dev/null
-
-  # if [[ $current_active == $version ]]; then
-  #   is_sudo tee "" $install_path/active &> /dev/null
-  # fi
 
   echo "Uninstall complete. Please activate a different version of NodeJs if installed"
   echo "anm use <version number>    # v16.15.0, v12.22.12, etc"
