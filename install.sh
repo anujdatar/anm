@@ -165,7 +165,7 @@
 
       MESSAGE=$(printf "%s\n" '# User specific environment\n'\
         'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then\n'\
-        'PATH="$HOME/.local/bin:$PATH"\n'\
+        '[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"\n'\
         'fi\n'\
         'export PATH\n'
       )
