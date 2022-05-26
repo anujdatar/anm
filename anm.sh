@@ -63,15 +63,22 @@ get_download_link() {
 }
 
 get_anm_install_location() {
-  local executable_path=$(which anm)
 
-  if [[ $executable_path == "/usr/bin/anm" ]]; then
-    echo "/opt/anm"
-  elif [[ $executable_path == "$HOME/.local/bin/anm" ]]; then
-    echo "$HOME/.anm"
+  if [ -s $ANM_DIR ]; then
+    echo $ANM_DIR
   else
     echo $(pwd)
   fi
+
+  # local executable_path=$(which anm)
+
+  # if [[ $executable_path == "/usr/bin/anm" ]]; then
+  #   echo "/opt/anm"
+  # elif [[ $executable_path == "$HOME/.local/bin/anm" ]]; then
+  #   echo "$HOME/.anm"
+  # else
+  #   echo $(pwd)
+  # fi
 }
 get_bin_path() {
   local install_path=$(get_anm_install_location)
