@@ -149,8 +149,8 @@
   else
     echo -e "\nInstalling ANM for user $USER\n"
 
-    install_path="/home/$USER/.anm"
-    bin_path="/home/$USER/.local/bin"
+    install_path="$HOME/.anm"
+    bin_path="$HOME/.local/bin"
 
     echo "Install path = $install_path"
 

@@ -67,8 +67,8 @@ get_anm_install_location() {
 
   if [[ $executable_path == "/usr/bin/anm" ]]; then
     echo "/opt/anm"
-  elif [[ $executable_path == "/home/$USER/.local/bin/anm" ]]; then
-    echo "/home/$USER/.anm"
+  elif [[ $executable_path == "$HOME/.local/bin/anm" ]]; then
+    echo "$HOME/.anm"
   else
     echo $(pwd)
   fi
@@ -79,7 +79,7 @@ get_bin_path() {
   if [[ $install_path == "/opt/anm" ]]; then
     echo "/usr/bin"
   else
-    echo "/home/$USER/.local/bin"
+    echo "$HOME/.local/bin"
   fi
 }
 
