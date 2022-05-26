@@ -179,10 +179,10 @@
   fi
 
   is_sudo() {
-    if [[ $install_path == "/opt/anm" ]]; then
-      sudo $@
-    else
+    if [[ $install_path =~ "$HOME" ]]; then
       $@
+    else
+      sudo $@
     fi
   }
 
