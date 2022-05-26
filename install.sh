@@ -186,7 +186,11 @@
     fi
   }
 
-  is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
+  if [[ -f "$(pwd)/anm.sh" ]]; then
+    install_path=$(pwd)
+  else
+    is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
+  fi
 
   is_sudo chmod +x ${install_path}/anm.sh
 
