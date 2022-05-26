@@ -132,10 +132,10 @@ anm_ls() {
 
 is_sudo() {
   local install_path=$(get_anm_install_location)
-  if [[ $install_path == "/opt/anm" ]]; then
-    sudo $@
-  else
+  if [[ -w "$(dirname $install_path)" ]]; then
     $@
+  else
+    sudo $@
   fi
 }
 
