@@ -98,7 +98,7 @@
   echo -e "\nChecking package dependencies\n"
   not_installed=""
 
-  for pkg in "$dependency_list"; do
+  for pkg in $dependency_list; do
     echo -n "Checking package: "
     format_yellow "$pkg\n"
     $check $pkg &> /dev/null
