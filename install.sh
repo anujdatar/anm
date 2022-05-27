@@ -193,7 +193,7 @@
     is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
   fi
 
-  echo "if [ -s \"$install_path\" ]; then ANM_DIR=\"$install_path\"; fi" | \
+  echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
   is_sudo tee -a $RC_FILE &> /dev/null
 
   is_sudo chmod +x ${install_path}/anm.sh
