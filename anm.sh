@@ -282,7 +282,7 @@ anm_uninstall() {
     anm_deactivate $version
     is_sudo rm -rf $install_path/versions/node/$version
   else
-    echo "Node version: $version not installed"
+    format_red "Node version: $version not installed\n"
     exit 1
   fi
 
