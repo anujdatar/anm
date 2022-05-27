@@ -134,7 +134,7 @@ anm_ls() {
 
   local current_active="$(cat $install_path/active)"
 
-  for installed in "$current_installed"; do
+  for installed in $current_installed; do
     if [ "$installed" = "$current_active" ]; then
       format_green "$installed"; echo " (active)"
     else
@@ -288,7 +288,7 @@ anm_uninstall() {
 
   local current_installed="$(cat $install_path/installed)"
   local final_list=""
-  for installed in "$current_installed"; do
+  for installed in $current_installed; do
     if [ "$installed" != "$version" ]; then
       final_list="$final_list $installed"
     fi
