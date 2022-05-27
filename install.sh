@@ -155,14 +155,14 @@
 
     echo "Install path = $install_path"
 
+    if [[ "$SHELL" =~ "bash" ]]; then
+      RC_FILE="$HOME/.bashrc"
+    elif [[ "$SHELL" =~ "zsh" ]]; then
+      RC_FILE="$HOME/.zshrc"
+    else
+      RC_FILE="$HOME/.profile"
+    fi
     if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then
-      if [[ "$SHELL" =~ "bash" ]]; then
-        RC_FILE="$HOME/.bashrc"
-      elif [[ "$SHELL" =~ "zsh" ]]; then
-        RC_FILE="$HOME/.zshrc"
-      else
-        RC_FILE="$HOME/.profile"
-      fi
 
       MESSAGE=$(printf "%s\n" '# User specific environment\n'\
         'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then\n'\
