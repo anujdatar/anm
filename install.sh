@@ -59,7 +59,7 @@
 
   ############################################################################
 
-  echo -e "Installing ANM to system\n\n"
+  echo -e "Installing ANM to system\n"
 
   ### check distro and use corresponding package manager
   dist=$(get_dist)
