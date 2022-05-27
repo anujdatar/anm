@@ -164,10 +164,10 @@
     fi
     if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then
 
-      MESSAGE=$(printf "%s\n" '# User specific environment\n'\
-        'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then\n'\
-        '[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"\n'\
-        'fi\n'\
+      MESSAGE=$(printf "%s\n" '# User specific environment'\
+        'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then'\
+        '[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"'\
+        'fi'\
         'export PATH\n'
       )
 
