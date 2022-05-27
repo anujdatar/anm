@@ -25,40 +25,46 @@ Only works for Node.js versions with specific distributions for Linux:
  - Node v4.0.0+ (armv6l, armv7l, arm64)
 
 ## Install
-```
-curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
-```
-```
-wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
-```
+1. Install to default user-space. This should install to `/home/$USER/.anm`
+  ```
+  curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
+  ```
+  ```
+  wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
+  ```
 
-This should install to `/home/$USER/.anm`.
+2. Install ANM system-wide, for all users. This should install to /opt/anm. Use the following:
+  ```
+  curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
+  ```
+  ```
+  wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
+  ```
+  > NOTE: most ANM actions, and node (npm install -g) will require `sudo` privileges.
 
-If you want to install ANM system-wide, for all users. Use the following:
-```
-curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
-```
-```
-wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
-```
-This should install to /opt/anm.
-> NOTE: most ANM actions, and node (npm install -g) will require `sudo` privileges.
+3. Custom location:
+    - Clone git repository
+    - Make `install.sh` an executable. `chmod +x install.sh`
+    - Run the install script. `./install.sh`
+
+4. If you want to use the script without installing, just clone the repository,
+install dependencies above, create files named `installed` and `active`. Make
+`anm.sh` and executable file `chmod +x anm.sh`. You should now be able to run
+ANM from the directory `./anm.sh ls-remote`, `./anm.sh install --lts`, etc.
 
 The convenience script does the following in case you want to install manually.
   1. Update/upgrade system
   2. Install missing dependencies using your package manager (apt/dnf/pacman)
-    - `curl`, `wget`, `git`, `jq`, `python3`, `python3-pip` (`python-pip` if using Arch). Ironically you need either `curl` or `wget to get started. 😝
-  3. Install `packaging` (a python package) using `pip`
-  4. Clones the [ANM git repo](https://github.com/anujdatar/anm) to `/home/$USER/.anm`
-  5. Makes `anm.sh` an executable and creates a symlink in `/home/$USER/.local/bin`
+    - `curl`, `wget`, `git`, `jq`, `python3`, `python3-pip` (`python-pip` if using Arch). Ironically you need either `curl` or `wget` to get started. 😝
+  3. Install `packaging` (a python package) using `pip`. `pip install packaging`
+  4. Clones the [ANM git repo](https://github.com/anujdatar/anm) to `/home/$USER/.anm` or `/opt/anm`. This step is skipped if you are installing from the repo-clone.
+  5. Makes `anm.sh` an executable (`chmod +x /<path>/anm.sh`). And creates a symlink in `/home/$USER/.local/bin` or `/opt/anm` depending on the install location (`ln -s /<path>/anm.sh /<bin_path>/anm`).
+  6. Add `export $ANM_DIR=/<install_path>/` to your shell rc profile (`.bashrc`, `.zshrc`, `.profile`, `/etc/profile.d/anm_profile.sh`). This is required for anm detect install location and work correctly. Currently `bash` and `zsh` are supported. Other shell users should make sure `$HOME/.profile` and/or `/etc/profile` are loaded when shell is launched.
 
-You might have to restart your system, or logout and log back in. Depends. You
+You might have to restart your system, or logout and log back in, or just close shell and reopen. Depends. You
 should be able to use anm from command line after this.
 
-If you want to use the script without installing, just clone the repository,
-install dependencies above, create files named `installed` and `active`. Make
-`anm.sh` and executable file `chmod +x anm.sh`. You should now be able to run
-ANM from the directory `./anm.sh ls-remote`, `./anm.sh install --lts`, etc.
+> Note: If installing only to your userspace, step 5 also checks if `$HOME/.local/bin` is in path. If not, it adds that to your shell rc profile.
 
 ## Uninstall
 Unfortunately this has to be manual for now
