@@ -201,9 +201,15 @@ anm_activate() {
 
   echo "Activating NodeJs version: $version"
 
-  is_sudo ln -s $binary_folder/node $bin_path/node
-  is_sudo ln -s $binary_folder/npm $bin_path/npm
-  is_sudo ln -s $binary_folder/npx $bin_path/npx
+  if [ -f "$binary_folder/node" ]; then
+    is_sudo ln -s $binary_folder/node $bin_path/node
+  fi
+  if [ -f "$binary_folder/npm" ]; then
+    is_sudo ln -s $binary_folder/npm $bin_path/npm
+  fi
+  if [ -f "$binary_folder/npx" ]; then
+    is_sudo ln -s $binary_folder/npx $bin_path/npx
+  fi
 
   if [ "$?" != 1 ]; then
     echo $version | is_sudo tee $install_path/active &> /dev/null
