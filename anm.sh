@@ -18,7 +18,7 @@ node_dist_index="https://nodejs.org/dist/index.json"
 
 get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
-  case $(uname -m) in
+  case "$(uname -m)" in
     x86_64)
       node_arch="linux-x64";;
     aarch64|arm64)
@@ -43,15 +43,15 @@ parse_version() {
 }
 
 get_sys_node_arch
-if [[ $? == 1 ]]; then
+if [ "$?" = 1 ]; then
   format_red "System OS and architecture not supported by ANM\n"
   format_red "Please check compatibility or contact developer\n"
   exit 1
 fi
 
 get_download_link() {
-  local version=$(parse_version $1)
-  if [[ $1 == "" ]]; then
+  local version="$(parse_version $1)"
+  if [ "$1" = "" ]; then
     format_red "No node version provided for download\n"
     exit 1
   fi
@@ -59,15 +59,15 @@ get_download_link() {
   local version_page="$base_link/$version"
   local download_filename="node-$1-$node_arch.tar.xz"
   local download_link="$version_page/$download_filename"
-  echo $download_link
+  echo "$download_link"
 }
 
 get_anm_install_location() {
 
   if [ -s "$ANM_DIR" ]; then
-    echo $ANM_DIR
+    echo "$ANM_DIR"
   else
-    echo $(pwd)
+    echo "$(pwd)"
   fi
 
   # local executable_path=$(which anm)
@@ -81,16 +81,16 @@ get_anm_install_location() {
   # fi
 }
 get_bin_path() {
-  local install_path=$(get_anm_install_location)
+  local install_path="$(get_anm_install_location)"
 
-  if [[ $install_path == "/opt/anm" ]]; then
+  if [ "$install_path" = "/opt/anm" ]; then
     echo "/usr/bin"
   else
     echo "$HOME/.local/bin"
   fi
 }
 
-python_script_path=$(get_anm_install_location)/web_json_parse.py
+python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
 ls_all() {
   python3 $python_script_path $node_dist_index $node_arch "ls_all"
@@ -109,9 +109,9 @@ latest_lts_version_number() {
 }
 
 anm_ls_remote() {
-  case $1 in
+  case "$1" in
     "--lts")
-      if [[ $2 ]]; then
+      if [ "$2" ]; then
         ls_latest_lts_version_data_by_name $2
       else
         ls_lts
@@ -124,28 +124,28 @@ anm_ls_remote() {
 }
 
 anm_ls() {
-  local install_path=$(get_anm_install_location)
-  local current_installed=$(cat $install_path/installed | sort -V -r)
+  local install_path="$(get_anm_install_location)"
+  local current_installed="$(cat $install_path/installed | sort -V -r)"
 
   if [ "$current_installed" = "" ]; then
     format_red "No versions of NodeJs installed using ANM\n"
     exit 0
   fi
 
-  local current_active=$(cat $install_path/active)
+  local current_active="$(cat $install_path/active)"
 
-  for installed in $current_installed; do
-    if [[ $installed == $current_active ]]; then
+  for installed in "$current_installed"; do
+    if [ "$installed" = "$current_active" ]; then
       format_green "$installed"; echo " (active)"
     else
-      echo $installed
+      echo "$installed"
     fi
   done
 }
 
 is_sudo() {
-  local install_path=$(get_anm_install_location)
-  if [[ -w "$(dirname $install_path)" ]]; then
+  local install_path="$(get_anm_install_location)"
+  if [ -w "$(dirname $install_path)" ]; then
     $@
   else
     sudo $@
@@ -153,44 +153,44 @@ is_sudo() {
 }
 
 anm_deactivate() {
-  local version=$(parse_version $1)
+  local version="$(parse_version $1)"
 
-  if [[ $version == "" ]]; then
-    echo No version passed to deactivate
+  if [ "$version" = "" ]; then
+    echo "No version passed to deactivate"
     return 0
   fi
 
-  local install_path=$(get_anm_install_location)
-  local current_active=$(cat $install_path/active)
-  local bin_path=$(get_bin_path)
+  local install_path="$(get_anm_install_location)"
+  local current_active="$(cat $install_path/active)"
+  local bin_path="$(get_bin_path)"
 
-  if [[ $current_active == $version ]]; then
+  if [ "$current_active" = "$version" ]; then
     echo "Deactivating current version of NodeJs: $version"
     echo "" | is_sudo tee "" $install_path/active &> /dev/null
 
-    if [[ -f $bin_path/node ]]; then
+    if [ -f "$bin_path/node" ]; then
       is_sudo rm $bin_path/node
     fi
-    if [[ -f $bin_path/npm ]]; then
+    if [ -f "$bin_path/npm" ]; then
       is_sudo  rm $bin_path/npm
     fi
-    if [[ -f $bin_path/npx ]]; then
+    if [ -f "$bin_path/npx" ]; then
       is_sudo rm $bin_path/npx
     fi
   fi
 }
 
 anm_activate() {
-  local version=$(parse_version $1)
+  local version="$(parse_version $1)"
 
-  local install_path=$(get_anm_install_location)
-  local bin_path=$(get_bin_path)
+  local install_path="$(get_anm_install_location)"
+  local bin_path="$(get_bin_path)"
 
-  local current_active=$(cat $install_path/active)
+  local current_active="$(cat $install_path/active)"
 
   local binary_folder="$install_path/versions/node/$version/bin"
 
-  if ! [[ -d "$install_path/versions/node/$version" ]]; then
+  if ! [ -d "$install_path/versions/node/$version" ]; then
     format_red "Version $version not installed"
     exit 1
   fi
@@ -205,36 +205,36 @@ anm_activate() {
   is_sudo ln -s $binary_folder/npm $bin_path/npm
   is_sudo ln -s $binary_folder/npx $bin_path/npx
 
-  if [[ $? != 1 ]]; then
+  if [ "$?" != 1 ]; then
     echo $version | is_sudo tee $install_path/active &> /dev/null
   fi
 }
 
 anm_install() {
   local version=""
-  case $1 in
+  case "$1" in
     "")
-      version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "");;
+      version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
     "--lts")
-      if [[ $2 ]]; then
-        lts_name=$(echo "$2" | tr '[:upper:]' '[:lower:]')
-        version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)
+      if [ "$2" ]; then
+        lts_name="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
+        version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
       else
-        version=$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")
+        version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
       fi;;
     *)
-      version=$(parse_version $1)
+      version="$(parse_version $1)"
   esac
 
-  if [[ $? == 1 ]]; then
+  if [ "$?" = 1 ]; then
     format_red "Unable to find version: $2\n"
     exit 1
   fi
 
-  anm_dir=$(get_anm_install_location)
+  anm_dir="$(get_anm_install_location)"
   node_install_dir="$anm_dir/versions/node/$version"
 
-  if [[ -d node_install_dir ]]; then
+  if [ -d "$node_install_dir" ]; then
     format_yellow "NodeJs release: $version is already installed"
     exit 1
   fi
@@ -242,13 +242,13 @@ anm_install() {
   is_sudo mkdir -p "$node_install_dir"
 
   download_filename="node-$version-$node_arch.tar.xz"
-  download_link=$(get_download_link $version)
+  download_link="$(get_download_link $version)"
 
   # if ! wget -q --method=HEAD $download_link; then
   if ! curl --output /dev/null --silent --head --fail "$download_link"; then
     format_red "Incorrect download link for node.js version\n"
     format_yellow "If you think this is an error, please contact dev on GitHub\n"
-    echo $download_link
+    echo "$download_link"
     exit 1
   fi
 
@@ -260,18 +260,18 @@ anm_install() {
   echo "Extracting nodejs to $node_install_dir"
   is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
 
-  echo $version | is_sudo tee -a $anm_dir/installed &> /dev/null
+  echo "$version" | is_sudo tee -a $anm_dir/installed &> /dev/null
 
   anm_activate $version
 }
 
 anm_uninstall() {
-  local version=$(parse_version $1)
+  local version="$(parse_version $1)"
 
-  local install_path=$(get_anm_install_location)
-  local bin_path=$(get_bin_path)
+  local install_path="$(get_anm_install_location)"
+  local bin_path="$(get_bin_path)"
 
-  if [[ -d $install_path/versions/node/$version ]]; then
+  if [ -d "$install_path/versions/node/$version" ]; then
     echo "Uninstalling node version: $version"
     anm_deactivate $version
     is_sudo rm -rf $install_path/versions/node/$version
@@ -280,14 +280,14 @@ anm_uninstall() {
     exit 1
   fi
 
-  local current_installed=$(cat $install_path/installed)
+  local current_installed="$(cat $install_path/installed)"
   local final_list=""
-  for installed in $current_installed; do
-    if [[ $installed != $version ]]; then
+  for installed in "$current_installed"; do
+    if [ "$installed" != "$version" ]; then
       final_list="$final_list $installed"
     fi
   done
-  echo $final_list | is_sudo tee $install_path/installed &> /dev/null
+  echo "$final_list" | is_sudo tee $install_path/installed &> /dev/null
 
   echo "Uninstall complete. Please activate a different version of NodeJs if installed"
   echo "anm use <version number>    # v16.15.0, v12.22.12, etc"
