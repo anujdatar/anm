@@ -141,7 +141,7 @@
   pip3 install packaging
 
   if [ "$1" = "system" ]; then
-    echo -e "\nInstalling ANM for entire system\n"
+    echo -e "\nInstalling ANM for all users\n"
     install_path="/opt/anm"
     bin_path="/usr/bin"
 
