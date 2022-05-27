@@ -126,6 +126,12 @@ anm_ls_remote() {
 anm_ls() {
   local install_path=$(get_anm_install_location)
   local current_installed=$(cat $install_path/installed | sort -V -r)
+
+  if [ "$current_installed" = "" ]; then
+    format_red "No versions of NodeJs installed using ANM\n"
+    exit 0
+  fi
+
   local current_active=$(cat $install_path/active)
 
   for installed in $current_installed; do
