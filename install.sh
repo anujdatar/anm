@@ -20,11 +20,11 @@
     ### Usage: get_dist ####
     local filename="/etc/os-release"
 
-    if [[ $(grep -i fedora $filename) ]]; then
+    if [[ $(grep -i fedora "$filename") ]]; then
       echo "fedora"
-    elif [[ $(grep -i arch $filename) || $(grep -i manjaro $filename) ]]; then
+    elif [[ $(grep -i arch "$filename") || $(grep -i manjaro $filename) ]]; then
       echo "arch"
-    elif [[ $(grep -i debian $filename) ]]; then
+    elif [[ $(grep -i debian "$filename") ]]; then
       echo "debian"
     else
       format_red "Unable to use your system's package manager\n"
@@ -63,24 +63,24 @@
 
   ### check distro and use corresponding package manager
   dist=$(get_dist)
-  if [[ $? == 1 ]]; then
-    echo $dist
+  if [ "$?" = 1 ]; then
+    echo "$dist"
     format_red "Script Error. Exiting\n"
     exit 1
   fi
 
-  if [[ $dist == "debian" ]]; then
+  if [ "$dist" = "debian" ]; then
     dependency_list="curl wget git jq python3 python3-pip"
     update="apt-get update"
     upgrade="apt-get upgrade -y"
     install="apt-get install -y"
     check="dpkg-query -s"
-  elif [[ $dist == "fedora" ]]; then
+  elif [ "$dist" = "fedora" ]; then
     dependency_list="curl wget git jq python3 python3-pip"
     upgrade="dnf upgrade -y"
     install="dnf install -y"
     check="dnf list installed"
-  elif [[ $dist == "arch" ]]; then
+  elif [ "$dist" = "arch" ]; then
     dependency_list="curl wget git jq python3 python-pip"
     upgrade="pacman -Syu --noconfirm"
     install="pacman -S --noconfirm"
@@ -89,7 +89,7 @@
 
   ### update and upgrade
   echo -e "\nUpdating package lists and upgrading system packages\n"
-  if [[ $update ]]; then
+  if [ "$update" ]; then
     sudo $update
   fi
   sudo $upgrade
@@ -98,12 +98,12 @@
   echo -e "\nChecking package dependencies\n"
   not_installed=""
 
-  for pkg in $dependency_list; do
+  for pkg in "$dependency_list"; do
     echo -n "Checking package: "
     format_yellow "$pkg\n"
     $check $pkg &> /dev/null
 
-    if [[ $? == 1 ]]; then
+    if [ "$?" = 1 ]; then
       format_yellow "    $pkg"
       echo -n " is "
       format_red "not installed\n"
@@ -115,7 +115,7 @@
     fi
   done
 
-  if [[ "$not_installed" == "" ]]; then
+  if [ "$not_installed" = "" ]; then
     echo -e "\nDependencies OK. Proceeding ...\n"
   else
     echo -e "Need to install missing dependencies: $not_installed \n"
@@ -124,13 +124,13 @@
     no="Installation cancelled.. Bye!!"
     yes_no_prompt "$question" "$yes" "$no"
 
-    if [[ $? == 1 ]]; then
+    if [ "$?" = 1 ]; then
       exit 1
     fi
     echo -e "\nRunning: $install $not_installed\n"
     sudo $install $not_installed
 
-    if [[ $? == 1 ]]; then
+    if [ "$?" = 1 ]; then
       format_red "Dependency install unsuccessful. Exiting installation\n"
       exit 1
     fi
@@ -140,7 +140,7 @@
   echo -e "\nInstalling pip dependencies: packaging\n"
   pip3 install packaging
 
-  if [[ $1 == 'system' ]]; then
+  if [ "$1" = "system" ]; then
     echo -e "\nInstalling ANM for entire system\n"
     install_path="/opt/anm"
     bin_path="/usr/bin"
@@ -172,23 +172,23 @@
       )
 
       echo "Adding $HOME/.local/bin to path, adding the following to $RC_FILE"
-      format_yellow $MESSAGE; echo
+      format_yellow "$MESSAGE"; echo
       echo "Works for Bash, Zsh. Please add $HOME/.profile to you rc file for other shells"
 
-      echo -e $MESSAGE >> $RC_FILE
+      echo -e "$MESSAGE" >> $RC_FILE
     fi
   fi
 
   is_sudo() {
-    if [[ -w "$(dirname $install_path)" ]]; then
+    if [ -w "$(dirname $install_path)" ]; then
       $@
     else
       sudo $@
     fi
   }
 
-  if [[ -f "$(pwd)/anm.sh" ]]; then
-    install_path=$(pwd)
+  if [ -f "$(pwd)/anm.sh" ]; then
+    install_path="$(pwd)"
   else
     is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
   fi
