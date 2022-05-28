@@ -2,10 +2,6 @@
 
 ![version](https://img.shields.io/github/v/tag/anujdatar/anm?label=version&sort=semver)
 
-**DISCLAIMER**: Still kinda beta, I am still tweaking and updating scripts.
-Not ready for production just yet. Basic functionality has been tested and is
-working fine on Ubuntu on X86_64 and ARM64. Still need to test on other platforms. Will update soon.
-
 A simple and lightweight alternative to
 [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Also works for ARM
 based systems, supported architectures armv6l, armv7l, arm64, amd64 (x86_64).
