@@ -153,8 +153,6 @@
     install_path="$HOME/.anm"
     bin_path="$HOME/.local/bin"
 
-    echo "Install path = $install_path"
-
     if [[ "$SHELL" =~ "bash" ]]; then
       RC_FILE="$HOME/.bashrc"
     elif [[ "$SHELL" =~ "zsh" ]]; then
@@ -192,6 +190,8 @@
   else
     is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
   fi
+
+  echo "Install path = $install_path"
 
   echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
   is_sudo tee -a $RC_FILE &> /dev/null
