@@ -164,9 +164,8 @@
 
       MESSAGE=$(printf "%s\n" '# User specific environment'\
         'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then'\
-        '[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"'\
-        'fi'\
-        'export PATH\n'
+        '[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"'\
+        'fi\n'
       )
 
       echo "Adding $HOME/.local/bin to path, adding the following to $RC_FILE"
