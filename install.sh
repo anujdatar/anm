@@ -207,7 +207,7 @@
     MESSAGE=$(printf "\n\n# Block added by ANM install >>>>>>>>>>>>\n"\
     "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
     "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path:\$PATH\"\n"
-    ">>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
+    "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
     )
 
     echo "Adding $install_path/bin to path, added the following to $RC_FILE"
