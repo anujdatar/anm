@@ -69,9 +69,8 @@
     # pip install packaging
 
     install_path="$HOME/.anm"
-    echo "ANM install path: $install_path"
 
-    RC_FILE="$HOME/.bashrc"
+    RC_FILE="$HOME/.brc"
 
   else
     # for Linux/Unix based systems
@@ -199,14 +198,14 @@
     is_sudo git clone https://github.com/anujdatar/anm.git ${install_path}
   fi
 
-  echo "Install path = $install_path"
+  echo "ANM install path: $install_path"
 
   ## add bin path to rc file
   if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
 
-    MESSAGE=$(printf "\n\n# Block added by ANM install >>>>>>>>>>>>\n"\
+    MESSAGE=$(printf "%s\n" '# Block added by ANM install >>>>>>>>>>>>\n'\
     "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
-    "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path:\$PATH\"\n"
+    "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path:\$PATH\"\n"\
     "fi"
     )
 
