@@ -61,129 +61,138 @@
 
   echo -e "Installing ANM to system\n"
 
-  ### check distro and use corresponding package manager
-  dist=$(get_dist)
-  if [ "$?" = 1 ]; then
-    echo "$dist"
-    format_red "Script Error. Exiting\n"
-    exit 1
-  fi
+  if [[ "$OSTYPE" = "msys" ]]; then
+    # check for Windows
+    echo "MinGW on WINDOWS detected. Setting up for Windows"
 
-  if [ "$dist" = "debian" ]; then
-    dependency_list="curl wget git jq python3 python3-pip"
-    update="apt-get update"
-    upgrade="apt-get upgrade -y"
-    install="apt-get install -y"
-    check="dpkg-query -s"
-  elif [ "$dist" = "fedora" ]; then
-    dependency_list="curl wget git jq python3 python3-pip"
-    upgrade="dnf upgrade -y"
-    install="dnf install -y"
-    check="dnf list installed"
-  elif [ "$dist" = "arch" ]; then
-    dependency_list="curl wget git jq python3 python-pip"
-    upgrade="pacman -Syu --noconfirm"
-    install="pacman -S --noconfirm"
-    check="pacman -Qi"
-  fi
-
-  ### update and upgrade
-  echo -e "\nUpdating package lists and upgrading system packages\n"
-  if [ "$update" ]; then
-    sudo $update
-  fi
-  sudo $upgrade
-
-  ### check if dependencies are met, else install
-  echo -e "\nChecking package dependencies\n"
-  not_installed=""
-
-  for pkg in $dependency_list; do
-    echo -n "Checking package: "
-    format_yellow "$pkg\n"
-    $check $pkg &> /dev/null
-
-    if [ "$?" = 1 ]; then
-      format_yellow "    $pkg"
-      echo -n " is "
-      format_red "not installed\n"
-      not_installed="$not_installed $pkg"
-    else
-      format_yellow "    $pkg"
-      echo -n " is "
-      format_green "installed\n"
-    fi
-  done
-
-  if [ "$not_installed" = "" ]; then
-    echo -e "\nDependencies OK. Proceeding ...\n"
-  else
-    echo -e "Need to install missing dependencies: $not_installed \n"
-    question="Would you like to install dependencies to continue? [Y]/n: "
-    yes="Installing dependencies"
-    no="Installation cancelled.. Bye!!"
-    yes_no_prompt "$question" "$yes" "$no"
-
-    if [ "$?" = 1 ]; then
-      exit 1
-    fi
-    echo -e "\nRunning: $install $not_installed\n"
-    sudo $install $not_installed
-
-    if [ "$?" = 1 ]; then
-      format_red "Dependency install unsuccessful. Exiting installation\n"
-      exit 1
-    fi
-    format_green "Dependency install successful\n"
-  fi
-
-  echo -e "\nInstalling pip dependencies: packaging\n"
-  pip3 install packaging
-
-  if [ "$1" = "system" ]; then
-    echo -e "\nInstalling ANM for all users\n"
-    install_path="/opt/anm"
-    bin_path="/usr/bin"
-
-    echo "Install path = $install_path"
-    RC_FILE="/etc/profile.d/anm_profile.sh"
-  else
-    echo -e "\nInstalling ANM for user $USER\n"
+    echo "Installing pip dependencies"
+    # pip install packaging
 
     install_path="$HOME/.anm"
-    bin_path="$HOME/.local/bin"
+    echo "ANM install path: $install_path"
 
-    if [[ "$SHELL" =~ "bash" ]]; then
-      RC_FILE="$HOME/.bashrc"
-    elif [[ "$SHELL" =~ "zsh" ]]; then
-      RC_FILE="$HOME/.zshrc"
-    else
-      RC_FILE="$HOME/.profile"
+    RC_FILE="$HOME/.bashrc"
+
+  else
+    # for Linux/Unix based systems
+
+    ### check distro and use corresponding package manager
+    dist=$(get_dist)
+    if [ "$?" = 1 ]; then
+      echo "$dist"
+      format_red "Script Error. Exiting\n"
+      exit 1
     fi
-    if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then
 
-      MESSAGE=$(printf "%s\n" '# User specific environment'\
-        'if ! [[ "$PATH" =~ "$HOME/.local/bin" ]]; then'\
-        '[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"'\
-        'fi\n'
-      )
+    if [ "$dist" = "debian" ]; then
+      dependency_list="curl wget git jq python3 python3-pip"
+      update="apt-get update"
+      upgrade="apt-get upgrade -y"
+      install="apt-get install -y"
+      check="dpkg-query -s"
+    elif [ "$dist" = "fedora" ]; then
+      dependency_list="curl wget git jq python3 python3-pip"
+      upgrade="dnf upgrade -y"
+      install="dnf install -y"
+      check="dnf list installed"
+    elif [ "$dist" = "arch" ]; then
+      dependency_list="curl wget git jq python3 python-pip"
+      upgrade="pacman -Syu --noconfirm"
+      install="pacman -S --noconfirm"
+      check="pacman -Qi"
+    fi
 
-      echo "Adding $HOME/.local/bin to path, adding the following to $RC_FILE"
-      format_yellow "$MESSAGE"; echo
-      echo "Works for Bash, Zsh. Please add $HOME/.profile to you rc file for other shells"
+    ### update and upgrade
+    echo -e "\nUpdating package lists and upgrading system packages\n"
+    if [ "$update" ]; then
+      sudo $update
+    fi
+    sudo $upgrade
 
-      echo -e "$MESSAGE" >> $RC_FILE
+    ### check if dependencies are met
+    echo -e "\nChecking package dependencies\n"
+    not_installed=""
+
+    for pkg in $dependency_list; do
+      echo -n "Checking package: "
+      format_yellow "$pkg\n"
+      $check $pkg &> /dev/null
+
+      if [ "$?" = 1 ]; then
+        format_yellow "    $pkg"
+        echo -n " is "
+        format_red "not installed\n"
+        not_installed="$not_installed $pkg"
+      else
+        format_yellow "    $pkg"
+        echo -n " is "
+        format_green "installed\n"
+      fi
+    done
+
+    ### install missing dependencies
+    if [ "$not_installed" = "" ]; then
+      echo -e "\nDependencies OK. Proceeding ...\n"
+    else
+      echo -e "Need to install missing dependencies: $not_installed \n"
+      question="Would you like to install dependencies to continue? [Y]/n: "
+      yes="Installing dependencies"
+      no="Installation cancelled.. Bye!!"
+      yes_no_prompt "$question" "$yes" "$no"
+
+      if [ "$?" = 1 ]; then
+        exit 1
+      fi
+      echo -e "\nRunning: $install $not_installed\n"
+      sudo $install $not_installed
+
+      if [ "$?" = 1 ]; then
+        format_red "Dependency install unsuccessful. Exiting installation\n"
+        exit 1
+      fi
+      format_green "Dependency install successful\n"
+    fi
+
+    # install pip dependency
+    echo -e "\nInstalling pip dependencies: packaging\n"
+    pip3 install packaging
+
+    ### set install and bin path for linux
+    if [ "$1" = "system" ]; then
+      echo -e "\nInstalling ANM for all users\n"
+      install_path="/opt/anm"
+
+      echo "Install path = $install_path"
+      RC_FILE="/etc/profile.d/anm_profile.sh"
+    else
+      echo -e "\nInstalling ANM for user $USER\n"
+
+      install_path="$HOME/.anm"
+
+      if [[ "$SHELL" =~ "bash" ]]; then
+        RC_FILE="$HOME/.bashrc"
+      elif [[ "$SHELL" =~ "zsh" ]]; then
+        RC_FILE="$HOME/.zshrc"
+      else
+        RC_FILE="$HOME/.profile"
+      fi
     fi
   fi
 
+  # function to check if sudo is required for install
   is_sudo() {
-    if [ -w "$(dirname $install_path)" ]; then
+    if [[ "$OSTYPE" = "msys" ]]; then
       $@
     else
-      sudo $@
+      if [ -w "$(dirname $install_path)" ]; then
+        $@
+      else
+        sudo $@
+      fi
     fi
   }
 
+  # check pwd and clone Git repo if necessary
   if [ -f "$(pwd)/anm.sh" ]; then
     install_path="$(pwd)"
   else
@@ -192,14 +201,33 @@
 
   echo "Install path = $install_path"
 
+  ## add bin path to rc file
+  if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
+
+    MESSAGE=$(printf "\n\n# Block added by ANM install >>>>>>>>>>>>\n"\
+    "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
+    "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path:\$PATH\"\n"
+    ">>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
+    )
+
+    echo "Adding $install_path/bin to path, added the following to $RC_FILE"
+    echo -e $MESSAGE; echo
+    echo "Should work directly for Bash, Zsh, and Git Bash for windows"
+    echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file"
+
+    echo -e $MESSAGE >> $RC_FILE
+  fi
+
+  # Add install path and environment dir ANM_DIR
   echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
   is_sudo tee -a $RC_FILE &> /dev/null
 
+  # make sure anm is executable
   is_sudo chmod +x ${install_path}/anm.sh
 
   echo -e "\nAdding ANM executable symlink to bin\n"
-  is_sudo mkdir -p ${bin_path}
-  is_sudo ln -s ${install_path}/anm.sh ${bin_path}/anm
+  is_sudo mkdir -p ${install_path}/bin
+  is_sudo ln -s ${install_path}/anm.sh ${install_path}/bin/anm
 
   is_sudo mkdir -p ${install_path}/versions/node
   is_sudo touch ${install_path}/active
