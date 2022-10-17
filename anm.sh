@@ -18,18 +18,22 @@ node_dist_index="https://nodejs.org/dist/index.json"
 
 get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
-  case "$(uname -m)" in
-    x86_64)
-      node_arch="linux-x64";;
-    aarch64|arm64)
-      node_arch="linux-arm64";;
-    armhf)
-      node_arch="linux-armv7l";;
-    *)
-      format_red "Unable to recognize system architecture\n"
-      format_red "Please contact developer on GitHub for solution\n"
-      exit 1;;
-  esac
+  if [[ "$OSTYPE" = "msys" ]]; then
+    node_arch="win-x64-zip"
+  else
+    case "$(uname -m)" in
+      x86_64)
+        node_arch="linux-x64";;
+      aarch64|arm64)
+        node_arch="linux-arm64";;
+      armhf)
+        node_arch="linux-armv7l";;
+      *)
+        format_red "Unable to recognize system architecture\n"
+        format_red "Please contact developer on GitHub for solution\n"
+        exit 1;;
+    esac
+  fi
 }
 
 parse_version() {
@@ -55,9 +59,16 @@ get_download_link() {
     format_red "No node version provided for download\n"
     exit 1
   fi
+
+  local download_filename=""
+  if [[ "$OSTYPE" = "msys" ]]; then
+    download_filename="node-$1-win-x64.zip"
+  else
+    download_filename="node-$1-$node_arch.tar.xz"
+  fi
+
   local base_link="https://nodejs.org/dist"
   local version_page="$base_link/$version"
-  local download_filename="node-$1-$node_arch.tar.xz"
   local download_link="$version_page/$download_filename"
   echo "$download_link"
 }
@@ -83,11 +94,12 @@ get_anm_install_location() {
 get_bin_path() {
   local install_path="$(get_anm_install_location)"
 
-  if [ "$install_path" = "/opt/anm" ]; then
-    echo "/usr/bin"
-  else
-    echo "$HOME/.local/bin"
-  fi
+  # if [ "$install_path" = "/opt/anm" ]; then
+  #   echo "/opt/anm/bin"
+  # else
+  #   echo "$HOME/.anm/bin"
+  # fi
+  echo "$install_path/bin"
 }
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
@@ -145,10 +157,14 @@ anm_ls() {
 
 is_sudo() {
   local install_path="$(get_anm_install_location)"
-  if [ -w "$(dirname $install_path)" ]; then
+  if [[ "$OSTYPE" = "msys" ]]; then
     $@
   else
-    sudo $@
+    if [ -w "$(dirname $install_path)" ]; then
+      $@
+    else
+      sudo $@
+    fi
   fi
 }
 
@@ -188,7 +204,12 @@ anm_activate() {
 
   local current_active="$(cat $install_path/active)"
 
-  local binary_folder="$install_path/versions/node/$version/bin"
+  local binary_folder=""
+  if [[ "$OSTYPE" = "msys" ]]; then
+    local binary_folder="$install_path/versions/node/$version"
+  else
+    local binary_folder="$install_path/versions/node/$version/bin"
+  fi
 
   if ! [ -d "$install_path/versions/node/$version" ]; then
     format_red "Version $version not installed"
