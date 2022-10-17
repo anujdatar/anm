@@ -65,9 +65,6 @@
     # check for Windows
     echo "MinGW on WINDOWS detected. Setting up for Windows"
 
-    # echo "Installing pip dependencies"
-    # pip install packaging
-
     install_path="$HOME/.anm"
 
     RC_FILE="$HOME/.bashrc"
@@ -152,10 +149,6 @@
       format_green "Dependency install successful\n"
     fi
 
-    # install pip dependency
-    # echo -e "\nInstalling pip dependencies: packaging\n"
-    # pip3 install packaging
-
     ### set install and bin path for linux
     if [ "$1" = "system" ]; then
       echo -e "\nInstalling ANM for all users\n"
@@ -193,7 +186,7 @@
 
   # install pip dependency
   echo -e "\nInstalling pip dependencies: packaging\n"
-  # pip3 install packaging
+  pip3 install packaging
 
   # check pwd and clone Git repo if necessary
   if [ -f "$(pwd)/anm.sh" ]; then
@@ -213,19 +206,17 @@
     "fi"
     )
 
-    echo "Adding $install_path/bin to path, added the following to $RC_FILE"
-    echo "# Block added by ANM install >>>>>>>>>>>>"
+    echo -e "\nAdding $install_path/bin to path, added the following to $RC_FILE"
+    echo -e "\n# Block added by ANM install >>>>>>>>>>>>"
     echo -e $MESSAGE
     echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
     echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
-    echo "Should work directly for Bash, Zsh, and Git Bash for windows"
+    echo -e "\nShould work directly for Bash, Zsh, and Git Bash for windows"
     echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file"
 
   fi
 
   echo -e "\n# Block added by ANM install >>>>>>>>>>>>" >> $RC_FILE
-  # | \
-  # is_sudo tee -a $RC_FILE &> /dev/null
 
   echo -e $MESSAGE >> $RC_FILE
 
@@ -233,8 +224,6 @@
   is_sudo tee -a $RC_FILE &> /dev/null
 
   echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>" >> $RC_FILE
-  # | \
-  # is_sudo tee -a $RC_FILE &> /dev/null
 
   # make sure anm is executable
   is_sudo chmod +x ${install_path}/anm.sh
