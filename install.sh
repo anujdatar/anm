@@ -65,12 +65,12 @@
     # check for Windows
     echo "MinGW on WINDOWS detected. Setting up for Windows"
 
-    echo "Installing pip dependencies"
+    # echo "Installing pip dependencies"
     # pip install packaging
 
     install_path="$HOME/.anm"
 
-    RC_FILE="$HOME/.brc"
+    RC_FILE="$HOME/.bashrc"
 
   else
     # for Linux/Unix based systems
@@ -153,8 +153,8 @@
     fi
 
     # install pip dependency
-    echo -e "\nInstalling pip dependencies: packaging\n"
-    pip3 install packaging
+    # echo -e "\nInstalling pip dependencies: packaging\n"
+    # pip3 install packaging
 
     ### set install and bin path for linux
     if [ "$1" = "system" ]; then
@@ -191,6 +191,10 @@
     fi
   }
 
+  # install pip dependency
+  echo -e "\nInstalling pip dependencies: packaging\n"
+  # pip3 install packaging
+
   # check pwd and clone Git repo if necessary
   if [ -f "$(pwd)/anm.sh" ]; then
     install_path="$(pwd)"
@@ -200,29 +204,37 @@
 
   echo "ANM install path: $install_path"
 
-  ## add bin path to rc file
+  ## add bin path and ANM_DIR to rc file
   if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
 
-    MESSAGE=$(printf "%s\n" '# Block added by ANM install >>>>>>>>>>>>\n'\
+    MESSAGE=$(printf "%s\n"\
     "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
     "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path:\$PATH\"\n"\
     "fi"
     )
 
     echo "Adding $install_path/bin to path, added the following to $RC_FILE"
-    echo -e $MESSAGE; echo
+    echo "# Block added by ANM install >>>>>>>>>>>>"
+    echo -e $MESSAGE
+    echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
+    echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
     echo "Should work directly for Bash, Zsh, and Git Bash for windows"
     echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file"
 
-    echo -e $MESSAGE >> $RC_FILE
   fi
 
-  # Add install path and environment dir ANM_DIR
+  echo -e "\n# Block added by ANM install >>>>>>>>>>>>" >> $RC_FILE
+  # | \
+  # is_sudo tee -a $RC_FILE &> /dev/null
+
+  echo -e $MESSAGE >> $RC_FILE
+
   echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
   is_sudo tee -a $RC_FILE &> /dev/null
 
-  echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>" | \
-  is_sudo tee -a $RC_FILE &> /dev/null
+  echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>" >> $RC_FILE
+  # | \
+  # is_sudo tee -a $RC_FILE &> /dev/null
 
   # make sure anm is executable
   is_sudo chmod +x ${install_path}/anm.sh
