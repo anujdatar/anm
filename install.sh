@@ -202,7 +202,7 @@
 
     MESSAGE=$(printf "%s\n"\
     "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
-    "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path:\$PATH\"\n"\
+    "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/bin:\$PATH\"\n"\
     "fi"
     )
 
