@@ -283,7 +283,11 @@ anm_install() {
     mv $anm_dir/versions/node/$download_filename $node_install_dir
     rm $anm_dir/versions/node/$download_filename.$extension
   else
-    is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
+    # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
+    is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$extension" \
+      -C $node_install_dir \
+      --strip-components=1
+    rm $anm_dir/versions/node/$download_filename.$extension
   fi
 
   echo "$version" | is_sudo tee -a $anm_dir/installed &> /dev/null
