@@ -254,7 +254,13 @@ anm_install() {
 
   is_sudo mkdir -p "$node_install_dir"
 
-  download_filename="node-$version-$node_arch.tar.xz"
+  download_filename="node-$version-$node_arch"
+  # ".tar.xz"
+  if [[ "$OSTYPE" = "msys" ]]; then
+    extension="zip"
+  else
+    extension="tar.xz"
+  fi
   download_link="$(get_download_link $version)"
 
   # if ! wget -q --method=HEAD $download_link; then
