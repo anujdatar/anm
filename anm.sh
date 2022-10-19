@@ -75,7 +75,7 @@ get_download_link() {
 
 get_anm_install_location() {
 
-  if [ -s "$ANM_DIR" ]; then
+  if [ -d "$ANM_DIR" ]; then
     echo "$ANM_DIR"
   else
     echo "$(pwd)"

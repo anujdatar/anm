@@ -209,7 +209,7 @@
     echo -e "\nAdding $install_path/bin to path, added the following to $RC_FILE"
     echo -e "\n# Block added by ANM install >>>>>>>>>>>>"
     echo -e $MESSAGE
-    echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
+    echo "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
     echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
     echo -e "\nShould work directly for Bash, Zsh, and Git Bash for windows"
     echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file"
@@ -220,7 +220,7 @@
 
   echo -e $MESSAGE >> $RC_FILE
 
-  echo "if [ -s \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
+  echo "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
   is_sudo tee -a $RC_FILE &> /dev/null
 
   echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>" >> $RC_FILE
