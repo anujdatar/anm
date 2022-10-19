@@ -274,7 +274,8 @@ anm_install() {
   echo
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
-  wget -O "/tmp/$download_filename" $download_link
+  # wget -O "/tmp/$download_filename" $download_link
+  curl $download_link --output $anm_dir/versions/node/$download_filename.$extension
 
   echo "Extracting nodejs to $node_install_dir"
   if [[ "$OSTYPE" = "msys" ]]; then
