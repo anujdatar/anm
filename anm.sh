@@ -285,7 +285,7 @@ anm_install() {
 
   echo "Extracting nodejs to $node_install_dir"
   if [[ "$OSTYPE" = "msys" ]]; then
-    unzip -q $anm_dir/versions/node/$download_filename.$extension
+    unzip -q "$anm_dir/versions/node/$download_filename.$extension" -d "$anm_dir/versions/node"
     mv $anm_dir/versions/node/$download_filename $node_install_dir
     rm $anm_dir/versions/node/$download_filename.$extension
   else
