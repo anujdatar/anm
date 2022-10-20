@@ -186,7 +186,7 @@
 
   # install pip dependency
   echo -e "\nInstalling pip dependencies: packaging\n"
-  pip3 install packaging
+  pip3 install packaging urllib3
 
   # check pwd and clone Git repo if necessary
   if [ -f "$(pwd)/anm.sh" ]; then
