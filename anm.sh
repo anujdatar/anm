@@ -4,6 +4,12 @@ ANM_VERSION="1.0.0"
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
+if [[ "$OSTYPE" = "msys" ]]; then
+  PYTHON="python"
+else
+  PYTHON="python3"
+fi
+
 # some text color formatting functions
   format_red() {
     ### Usage: format_dist "string", use \n at the end for linebreak ###
@@ -91,19 +97,19 @@ get_bin_path() {
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
 ls_all() {
-  python3 $python_script_path $node_dist_index $node_arch "ls_all"
+  $PYTHON $python_script_path $node_dist_index $node_arch "ls_all"
 }
 ls_lts() {
-  python3 $python_script_path $node_dist_index $node_arch "ls_lts"
+  $PYTHON $python_script_path $node_dist_index $node_arch "ls_lts"
 }
 ls_latest() {
-  python3 $python_script_path $node_dist_index $node_arch "ls_latest"
+  $PYTHON $python_script_path $node_dist_index $node_arch "ls_latest"
 }
 ls_latest_lts_version_data_by_name() {
-  python3 $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
+  $PYTHON $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
 }
 latest_lts_version_number() {
-  python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $1
+  $PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $1
 }
 
 anm_ls_remote() {
@@ -227,13 +233,13 @@ anm_install() {
   local version=""
   case "$1" in
     "")
-      version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
+      version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
     "--lts")
       if [ "$2" ]; then
         lts_name="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
-        version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
+        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
       else
-        version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
+        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
       fi;;
     *)
       version="$(parse_version $1)"
