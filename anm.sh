@@ -281,13 +281,14 @@ anm_install() {
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
   # wget -O "/tmp/$download_filename" $download_link
-  curl $download_link --output $anm_dir/versions/node/$download_filename.$extension
+  curl $download_link --output "$anm_dir/versions/node/$download_filename.$extension"
 
   echo "Extracting nodejs to $node_install_dir"
   if [[ "$OSTYPE" = "msys" ]]; then
     unzip -q "$anm_dir/versions/node/$download_filename.$extension" -d "$anm_dir/versions/node"
     rm -rf "$node_install_dir"
-    rm $anm_dir/versions/node/$download_filename.$extension
+    mv "$anm_dir/versions/node/${download_filename::-4}" "$node_install_dir"
+    rm "$anm_dir/versions/node/$download_filename.$extension"
   else
     # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
     is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$extension" \
