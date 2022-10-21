@@ -16,6 +16,8 @@
     echo -en "\e[33m$1\e[0m"
   }
 
+  # test if system is running windows
+  windows() { [[ -n "$WINDIR" ]]; }
   get_dist() {
     ### Usage: get_dist ####
     local filename="/etc/os-release"
