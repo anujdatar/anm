@@ -11,16 +11,29 @@ else
 fi
 
 # some text color formatting functions
-  format_red() {
-    ### Usage: format_dist "string", use \n at the end for linebreak ###
-    echo -en "\e[31m$1\e[0m"
-  }
-  format_green() {
-    echo -en "\e[32m$1\e[0m"
-  }
-  format_yellow() {
-    echo -en "\e[33m$1\e[0m"
-  }
+format_red() {
+  ### Usage: format_dist "string", use \n at the end for linebreak ###
+  echo -en "\e[31m$1\e[0m"
+}
+format_green() {
+  echo -en "\e[32m$1\e[0m"
+}
+format_yellow() {
+  echo -en "\e[33m$1\e[0m"
+}
+
+# test if system is running windows
+windows() { [[ -n "$WINDIR" ]]; }
+
+symlink() {
+  if windows; then
+    target=$(cygpath -w $1)
+    link=$(cygpath -w $2)
+    cmd <<< "mklink $link $target" > /dev/null
+  else
+    ln -s "$1" "$2"
+  fi
+}
 
 get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
