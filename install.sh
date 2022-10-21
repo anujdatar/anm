@@ -18,6 +18,15 @@
 
   # test if system is running windows
   windows() { [[ -n "$WINDIR" ]]; }
+
+  symlink() {
+    if windows; then
+      cmd <<< "mklink \"$2\" \"$1\"" > /dev/null
+    else
+      ln -s "$1" "$2"
+    fi
+  }
+
   get_dist() {
     ### Usage: get_dist ####
     local filename="/etc/os-release"
