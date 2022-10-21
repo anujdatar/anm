@@ -241,7 +241,7 @@
 
   echo -e "\nAdding ANM executable symlink to bin\n"
   is_sudo mkdir -p ${install_path}/bin
-  is_sudo ln -s ${install_path}/anm.sh ${install_path}/bin/anm
+  is_sudo symlink "${install_path}/anm.sh" "${install_path}/bin/anm"
 
   is_sudo mkdir -p ${install_path}/versions/node
   is_sudo touch ${install_path}/active
