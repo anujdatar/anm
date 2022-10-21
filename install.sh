@@ -21,7 +21,9 @@
 
   symlink() {
     if windows; then
-      cmd <<< "mklink \"$2\" \"$1\"" > /dev/null
+      target=$(cygpath -w $1)
+      link=$(cygpath -w $2)
+      cmd <<< "mklink $link $target" > /dev/null
     else
       ln -s "$1" "$2"
     fi
