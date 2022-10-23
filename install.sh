@@ -192,8 +192,8 @@
     fi
   }
 
-  # install pip dependency
-  echo -e "\nInstalling pip dependencies: packaging\n"
+  # install pip dependencies
+  echo "Installing pip dependencies: packaging urllib3"
   pip3 install packaging urllib3
 
   # check pwd and clone Git repo if necessary
