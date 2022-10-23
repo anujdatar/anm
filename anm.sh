@@ -230,8 +230,6 @@ anm_activate() {
     exit 1
   fi
 
-  is_sudo mkdir -p $bin_path
-
   anm_deactivate $current_active
 
   echo "Activating NodeJs version: $version"
