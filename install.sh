@@ -8,6 +8,7 @@
   linux() { [[ "$OSTYPE" == "linux-gnu"* ]]; }
   darwin() { [[ "$OSTYPE" == "darwin"* ]]; }
   windows() { [ -n "$WINDIR" ]; }
+
   # some text color formatting functions
   format_red() {
     ### Usage: format_dist "string", use \n at the end for linebreak ###
@@ -77,23 +78,9 @@
         esac
     done
   }
-
-  ############################################################################
-
-  echo -e "Installing ANM to system\n"
-
-  if [[ "$OSTYPE" = "msys" ]]; then
-    # check for Windows
-    echo "MinGW on WINDOWS detected. Setting up for Windows"
-
-    install_path="$HOME/.anm"
-
-    RC_FILE="$HOME/.bashrc"
-
-  else
-    # for Linux/Unix based systems
-
-    ### check distro and use corresponding package manager
+  ##############################################################
+  if linux; then
+    # update linux system packages, and install dependencies
     dist=$(get_dist)
     if [ "$?" = 1 ]; then
       echo "$dist"
@@ -119,14 +106,14 @@
       check="pacman -Qi"
     fi
 
-    ### update and upgrade
+    # update and upgrade
     echo -e "\nUpdating package lists and upgrading system packages\n"
     if [ "$update" ]; then
       sudo $update
     fi
     sudo $upgrade
 
-    ### check if dependencies are met
+    # check if dependencies are met
     echo -e "\nChecking package dependencies\n"
     not_installed=""
 
@@ -147,7 +134,7 @@
       fi
     done
 
-    ### install missing dependencies
+    # install missing dependencies
     if [ "$not_installed" = "" ]; then
       echo -e "\nDependencies OK. Proceeding ...\n"
     else
@@ -169,32 +156,32 @@
       fi
       format_green "Dependency install successful\n"
     fi
+  fi
 
-    ### set install and bin path for linux
+  # set install path and rc_file location
+  install_path="$HOME/.anm"
+  RC_FILE="$HOME/.bashrc"
+
+  if windows; then
+    echo "MinGW / CygWin detected. Setting up for windows"
+  elif linux; then
     if [ "$1" = "system" ]; then
-      echo -e "\nInstalling ANM for all users\n"
+      echo "Installing ANM for all users"
       install_path="/opt/anm"
-
-      echo "Install path = $install_path"
       RC_FILE="/etc/profile.d/anm_profile.sh"
     else
-      echo -e "\nInstalling ANM for user $USER\n"
-
-      install_path="$HOME/.anm"
-
-      if [[ "$SHELL" =~ "bash" ]]; then
-        RC_FILE="$HOME/.bashrc"
-      elif [[ "$SHELL" =~ "zsh" ]]; then
-        RC_FILE="$HOME/.zshrc"
-      else
-        RC_FILE="$HOME/.profile"
-      fi
+      echo "Installing ANM for user $USER"
+      case "$SHELL" in
+        *bash*);;
+        *zsh*) RC_FILE="$HOME/.zshrc";;
+        *) RC_FILE="$HOME/.profile";;
     fi
   fi
 
-  # function to check if sudo is required for install
   is_sudo() {
-    if [[ "$OSTYPE" = "msys" ]]; then
+    ### check if sudo is required for install
+    ### Usage: is_sudo [command...]
+    if windows; then
       $@
     else
       if [ -w "$(dirname $install_path)" ]; then
