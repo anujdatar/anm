@@ -204,14 +204,8 @@ anm_deactivate() {
     echo "Deactivating current version of NodeJs: $version"
     echo "" | is_sudo tee "" $install_path/active &> /dev/null
 
-    if [ -f "$bin_path/node" ]; then
-      is_sudo rm $bin_path/node
-    fi
-    if [ -f "$bin_path/npm" ]; then
-      is_sudo  rm $bin_path/npm
-    fi
-    if [ -f "$bin_path/npx" ]; then
-      is_sudo rm $bin_path/npx
+    if [ -d "$install_path/versions/current" ]; then
+      is_sudo rm ${install_path}/versions/current
     fi
   fi
 }
@@ -242,14 +236,8 @@ anm_activate() {
 
   echo "Activating NodeJs version: $version"
 
-  if [ -f "$binary_folder/node" ]; then
-    is_sudo symlink "$binary_folder/node" "$bin_path/node"
-  fi
-  if [ -f "$binary_folder/npm" ]; then
-    is_sudo symlink "$binary_folder/npm" "$bin_path/npm"
-  fi
-  if [ -f "$binary_folder/npx" ]; then
-    is_sudo symlink "$binary_folder/npx" "$bin_path/npx"
+  if [ -d "$binary_folder" ]; then
+    is_sudo symlink "$binary_folder" "$install_path/versions/current"
   fi
 
   if [ "$?" != 1 ]; then
