@@ -22,7 +22,6 @@ format_yellow() {
   echo -en "\e[33m$1\e[0m"
 }
 
-
 symlink() {
   ### Create symbolic links ###
   ### Usage: mklink "original-path" "link-path" ###
@@ -88,11 +87,11 @@ if [ "$?" = 1 ]; then
 fi
 
 get_download_link() {
-  local version="$(parse_version $1)"
   if [ "$1" = "" ]; then
     format_red "No node version provided for download\n"
     exit 1
   fi
+  local version="$(parse_version $1)"
 
   local download_filename=""
   if windows; then

@@ -21,7 +21,6 @@
     echo -en "\e[33m$1\e[0m"
   }
 
-
   symlink() {
     ### Create symbolic links ###
     ### Usage: mklink "original-path" "link-path" ###
