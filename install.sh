@@ -42,11 +42,11 @@
     ### Usage: get_dist ####
     local filename="/etc/os-release"
 
-    if [[ $(grep -i fedora "$filename") ]]; then
+    if [ $(grep -i fedora "$filename") ]; then
       echo "fedora"
-    elif [[ $(grep -i arch "$filename") || $(grep -i manjaro $filename) ]]; then
+    elif [ $(grep -i arch "$filename") ] || [ $(grep -i manjaro $filename) ]; then
       echo "arch"
-    elif [[ $(grep -i debian "$filename") ]]; then
+    elif [ $(grep -i debian "$filename") ]; then
       echo "debian"
     else
       format_red "Unable to use your system's package manager\n"
