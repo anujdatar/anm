@@ -3,7 +3,11 @@
   # enclosing everything in braces to ensure entire file is downloaded
   # and intact, so there are no errors on first download/install
 
-  # utility function for this
+  ####################  utility functions ######################
+  # OS detection functions
+  linux() { [[ "$OSTYPE" == "linux-gnu"* ]]; }
+  darwin() { [[ "$OSTYPE" == "darwin"* ]]; }
+  windows() { [ -n "$WINDIR" ]; }
   # some text color formatting functions
   format_red() {
     ### Usage: format_dist "string", use \n at the end for linebreak ###
@@ -16,8 +20,6 @@
     echo -en "\e[33m$1\e[0m"
   }
 
-  # test if system is running windows
-  windows() { [[ -n "$WINDIR" ]]; }
 
   symlink() {
     if windows; then

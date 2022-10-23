@@ -4,11 +4,11 @@ ANM_VERSION="1.0.0"
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
-if [[ "$OSTYPE" = "msys" ]]; then
-  PYTHON="python"
-else
-  PYTHON="python3"
-fi
+####################  utility functions ######################
+# OS detection functions
+linux() { [[ "$OSTYPE" == "linux-gnu"* ]]; }
+darwin() { [[ "$OSTYPE" == "darwin"* ]]; }
+windows() { [ -n "$WINDIR" ]; }
 
 # some text color formatting functions
 format_red() {
@@ -22,8 +22,6 @@ format_yellow() {
   echo -en "\e[33m$1\e[0m"
 }
 
-# test if system is running windows
-windows() { [[ -n "$WINDIR" ]]; }
 
 symlink() {
   if windows; then
