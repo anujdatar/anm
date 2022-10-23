@@ -242,6 +242,9 @@ anm_activate() {
 
   if [ "$?" != 1 ]; then
     echo $version | is_sudo tee $install_path/active &> /dev/null
+  else
+    format_red "Error while activating node version $version\n"
+    exit 1
   fi
 }
 
