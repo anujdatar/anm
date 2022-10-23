@@ -24,10 +24,16 @@ format_yellow() {
 
 
 symlink() {
+  ### Create symbolic links ###
+  ### Usage: mklink "original-path" "link-path" ###
   if windows; then
     target=$(cygpath -w $1)
     link=$(cygpath -w $2)
-    cmd <<< "mklink $link $target" > /dev/null
+    if [ -d "$target" ]; then
+      cmd <<< "mklink /D $link $target" > /dev/null
+    else
+      cmd <<< "mklink $link $target" > /dev/null
+    fi
   else
     ln -s "$1" "$2"
   fi
