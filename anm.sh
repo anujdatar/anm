@@ -39,11 +39,19 @@ symlink() {
   fi
 }
 
+# set which python keyword to use
+if windows; then
+  PYTHON="python"
+else
+  PYTHON="python3"
+fi
+
 get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
-  if [[ "$OSTYPE" = "msys" ]]; then
+  # TODO: add Darwin detection
+  if windows; then
     node_arch="win-x64-zip"
-  else
+  elif linux; then
     case "$(uname -m)" in
       x86_64)
         node_arch="linux-x64";;
@@ -56,6 +64,9 @@ get_sys_node_arch() {
         format_red "Please contact developer on GitHub for solution\n"
         exit 1;;
     esac
+  elif darwin; then
+    echo "macOS not supported yet. Coming soon though"
+    exit 1
   fi
 }
 
@@ -84,10 +95,10 @@ get_download_link() {
   fi
 
   local download_filename=""
-  if [[ "$OSTYPE" = "msys" ]]; then
-    download_filename="node-$1-win-x64.zip"
-  else
-    download_filename="node-$1-$node_arch.tar.xz"
+  if windows; then
+    download_filename="node-$version-win-x64.zip"
+  elif linux; then
+    download_filename="node-$version-$node_arch.tar.xz"
   fi
 
   local base_link="https://nodejs.org/dist"
@@ -166,7 +177,7 @@ anm_ls() {
 
 is_sudo() {
   local install_path="$(get_anm_install_location)"
-  if [[ "$OSTYPE" = "msys" ]]; then
+  if windows; then
     $@
   else
     if [ -w "$(dirname $install_path)" ]; then
@@ -214,7 +225,7 @@ anm_activate() {
   local current_active="$(cat $install_path/active)"
 
   local binary_folder=""
-  if [[ "$OSTYPE" = "msys" ]]; then
+  if windows; then
     local binary_folder="$install_path/versions/node/$version"
   else
     local binary_folder="$install_path/versions/node/$version/bin"
@@ -277,12 +288,17 @@ anm_install() {
 
   is_sudo mkdir -p "$node_install_dir"
 
-  download_filename="node-$version-$node_arch"
-  # ".tar.xz"
-  if [[ "$OSTYPE" = "msys" ]]; then
+  if windows; then
+    download_filename="node-$version-win-x64"
     extension="zip"
-  else
+  elif linux; then
+    download_filename="node-$version-$node_arch"
     extension="tar.xz"
+  elif darwin; then
+    download_filename="node-$version-darwin-(arm64 or x64)"
+    extension="tar.xz"
+    format_red "macOS not supported as yet."
+    exit 1
   fi
   download_link="$(get_download_link $version)"
 
@@ -301,10 +317,10 @@ anm_install() {
   curl $download_link --output "$anm_dir/versions/node/$download_filename.$extension"
 
   echo "Extracting nodejs to $node_install_dir"
-  if [[ "$OSTYPE" = "msys" ]]; then
+  if windows; then
     unzip -q "$anm_dir/versions/node/$download_filename.$extension" -d "$anm_dir/versions/node"
     rm -rf "$node_install_dir"
-    mv "$anm_dir/versions/node/${download_filename::-4}" "$node_install_dir"
+    mv "$anm_dir/versions/node/$download_filename" "$node_install_dir"
     rm "$anm_dir/versions/node/$download_filename.$extension"
   else
     # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
