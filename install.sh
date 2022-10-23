@@ -205,38 +205,42 @@
 
   echo "ANM install path: $install_path"
 
-  ## add bin path and ANM_DIR to rc file
+  ## add bin path and ANM_DIR to rc_file
+  RC_STRING=$(printf "%s\n"\
+  "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
+  "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/bin:\$PATH\"\n"\
+  "fi\n"\
+  "if ! [[ \"\$PATH\" =~ \"$install_path/versions/current\" ]]; then\n"\
+  "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/versions/current:\$PATH\"\n"\
+  "fi\n"
+  )
+
   if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
-
-    MESSAGE=$(printf "%s\n"\
-    "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then\n"\
-    "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/bin:\$PATH\"\n"\
-    "fi"
-    )
-
     echo -e "\nAdding $install_path/bin to path, added the following to $RC_FILE"
-    echo -e "\n# Block added by ANM install >>>>>>>>>>>>"
-    echo -e $MESSAGE
+    echo "# >>>>>>>> Block added by ANM install >>>>>>>>"
+    echo -e $RC_STRING
     echo "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
     echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
     echo -e "\nShould work directly for Bash, Zsh, and Git Bash for windows"
     echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file"
 
+    echo "# >>>>>>>> Block added by ANM install >>>>>>>>" | \
+    is_sudo tee -a $RC_FILE &> /dev/null
+
+    echo $RC_STRING | \
+    is_sudo tee -a $RC_FILE &> /dev/null
+
+    echo "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
+    is_sudo tee -a $RC_FILE &> /dev/null
+
+    echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>" | \
+    is_sudo tee -a $RC_FILE &> /dev/null
   fi
 
-  echo -e "\n# Block added by ANM install >>>>>>>>>>>>" >> $RC_FILE
-
-  echo -e $MESSAGE >> $RC_FILE
-
-  echo "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi" | \
-  is_sudo tee -a $RC_FILE &> /dev/null
-
-  echo "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>" >> $RC_FILE
-
-  # make sure anm is executable
+  # make sure anm.sh is executable
   is_sudo chmod +x ${install_path}/anm.sh
 
-  echo -e "\nAdding ANM executable symlink to bin\n"
+  echo "Adding ANM executable symlink to bin"; echo
   is_sudo mkdir -p ${install_path}/bin
   is_sudo symlink "${install_path}/anm.sh" "${install_path}/bin/anm"
 
