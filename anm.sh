@@ -87,6 +87,7 @@ if [ "$?" = 1 ]; then
 fi
 
 get_download_link() {
+  ### construct the download link string
   if [ "$1" = "" ]; then
     format_red "No node version provided for download\n"
     exit 1
@@ -107,7 +108,7 @@ get_download_link() {
 }
 
 get_anm_install_location() {
-
+  ### get ANM install location (folder)
   if [ -d "$ANM_DIR" ]; then
     echo "$ANM_DIR"
   else
@@ -116,6 +117,7 @@ get_anm_install_location() {
 }
 
 get_bin_path() {
+  ### get path of the anm bin folder
   local install_path="$(get_anm_install_location)"
 
   echo "$install_path/bin"
