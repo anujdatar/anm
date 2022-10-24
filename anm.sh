@@ -113,6 +113,9 @@ get_anm_install_location() {
     echo "$ANM_DIR"
   else
     echo "$(pwd)"
+    touch "$(pwd)/active"
+    touch "$(pwd)/installed"
+    mkdir -p "$(pwd)/versions/node"
   fi
 }
 
