@@ -1,35 +1,72 @@
 #!/bin/bash
 
-ANM_VERSION="1.0.0"
+ANM_VERSION="2.0.0"
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
+####################  utility functions ######################
+# OS detection functions
+linux() { [[ "$OSTYPE" == "linux-gnu"* ]]; }
+darwin() { [[ "$OSTYPE" == "darwin"* ]]; }
+windows() { [ -n "$WINDIR" ]; }
+
 # some text color formatting functions
-  format_red() {
-    ### Usage: format_dist "string", use \n at the end for linebreak ###
-    echo -en "\e[31m$1\e[0m"
-  }
-  format_green() {
-    echo -en "\e[32m$1\e[0m"
-  }
-  format_yellow() {
-    echo -en "\e[33m$1\e[0m"
-  }
+format_red() {
+  ### Usage: format_dist "string", use \n at the end for linebreak ###
+  echo -en "\e[31m$1\e[0m"
+}
+format_green() {
+  echo -en "\e[32m$1\e[0m"
+}
+format_yellow() {
+  echo -en "\e[33m$1\e[0m"
+}
+
+symlink() {
+  ### Create symbolic links ###
+  ### Usage: mklink "original-path" "link-path" ###
+  if windows; then
+    target=$(cygpath -w $1)
+    link=$(cygpath -w $2)
+    if [ -d "$target" ]; then
+      cmd <<< "mklink /D $link $target" > /dev/null
+    else
+      cmd <<< "mklink $link $target" > /dev/null
+    fi
+  else
+    ln -s "$1" "$2"
+  fi
+}
+
+# set which python keyword to use
+if windows; then
+  PYTHON="python"
+else
+  PYTHON="python3"
+fi
 
 get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
-  case "$(uname -m)" in
-    x86_64)
-      node_arch="linux-x64";;
-    aarch64|arm64)
-      node_arch="linux-arm64";;
-    armhf)
-      node_arch="linux-armv7l";;
-    *)
-      format_red "Unable to recognize system architecture\n"
-      format_red "Please contact developer on GitHub for solution\n"
-      exit 1;;
-  esac
+  # TODO: add Darwin detection
+  if windows; then
+    node_arch="win-x64-zip"
+  elif linux; then
+    case "$(uname -m)" in
+      x86_64)
+        node_arch="linux-x64";;
+      aarch64|arm64)
+        node_arch="linux-arm64";;
+      armhf)
+        node_arch="linux-armv7l";;
+      *)
+        format_red "Unable to recognize system architecture\n"
+        format_red "Please contact developer on GitHub for solution\n"
+        exit 1;;
+    esac
+  elif darwin; then
+    echo "macOS not supported yet. Coming soon though"
+    exit 1
+  fi
 }
 
 parse_version() {
@@ -50,62 +87,61 @@ if [ "$?" = 1 ]; then
 fi
 
 get_download_link() {
-  local version="$(parse_version $1)"
+  ### construct the download link string
   if [ "$1" = "" ]; then
     format_red "No node version provided for download\n"
     exit 1
   fi
+  local version="$(parse_version $1)"
+
+  local download_filename=""
+  if windows; then
+    download_filename="node-$version-win-x64.zip"
+  elif linux; then
+    download_filename="node-$version-$node_arch.tar.xz"
+  fi
+
   local base_link="https://nodejs.org/dist"
   local version_page="$base_link/$version"
-  local download_filename="node-$1-$node_arch.tar.xz"
   local download_link="$version_page/$download_filename"
   echo "$download_link"
 }
 
 get_anm_install_location() {
-
-  if [ -s "$ANM_DIR" ]; then
+  ### get ANM install location (folder)
+  if [ -d "$ANM_DIR" ]; then
     echo "$ANM_DIR"
   else
     echo "$(pwd)"
+    touch "$(pwd)/active"
+    touch "$(pwd)/installed"
+    mkdir -p "$(pwd)/versions/node"
   fi
-
-  # local executable_path=$(which anm)
-
-  # if [[ $executable_path == "/usr/bin/anm" ]]; then
-  #   echo "/opt/anm"
-  # elif [[ $executable_path == "$HOME/.local/bin/anm" ]]; then
-  #   echo "$HOME/.anm"
-  # else
-  #   echo $(pwd)
-  # fi
 }
+
 get_bin_path() {
+  ### get path of the anm bin folder
   local install_path="$(get_anm_install_location)"
 
-  if [ "$install_path" = "/opt/anm" ]; then
-    echo "/usr/bin"
-  else
-    echo "$HOME/.local/bin"
-  fi
+  echo "$install_path/bin"
 }
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
 ls_all() {
-  python3 $python_script_path $node_dist_index $node_arch "ls_all"
+  $PYTHON $python_script_path $node_dist_index $node_arch "ls_all"
 }
 ls_lts() {
-  python3 $python_script_path $node_dist_index $node_arch "ls_lts"
+  $PYTHON $python_script_path $node_dist_index $node_arch "ls_lts"
 }
 ls_latest() {
-  python3 $python_script_path $node_dist_index $node_arch "ls_latest"
+  $PYTHON $python_script_path $node_dist_index $node_arch "ls_latest"
 }
 ls_latest_lts_version_data_by_name() {
-  python3 $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
+  $PYTHON $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
 }
 latest_lts_version_number() {
-  python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $1
+  $PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $1
 }
 
 anm_ls_remote() {
@@ -145,10 +181,14 @@ anm_ls() {
 
 is_sudo() {
   local install_path="$(get_anm_install_location)"
-  if [ -w "$(dirname $install_path)" ]; then
+  if windows; then
     $@
   else
-    sudo $@
+    if [ -w "$(dirname $install_path)" ]; then
+      $@
+    else
+      sudo $@
+    fi
   fi
 }
 
@@ -168,14 +208,8 @@ anm_deactivate() {
     echo "Deactivating current version of NodeJs: $version"
     echo "" | is_sudo tee "" $install_path/active &> /dev/null
 
-    if [ -f "$bin_path/node" ]; then
-      is_sudo rm $bin_path/node
-    fi
-    if [ -f "$bin_path/npm" ]; then
-      is_sudo  rm $bin_path/npm
-    fi
-    if [ -f "$bin_path/npx" ]; then
-      is_sudo rm $bin_path/npx
+    if [ -d "$install_path/versions/current" ]; then
+      is_sudo rm ${install_path}/versions/current
     fi
   fi
 }
@@ -188,31 +222,31 @@ anm_activate() {
 
   local current_active="$(cat $install_path/active)"
 
-  local binary_folder="$install_path/versions/node/$version/bin"
+  local binary_folder=""
+  if windows; then
+    local binary_folder="$install_path/versions/node/$version"
+  else
+    local binary_folder="$install_path/versions/node/$version/bin"
+  fi
 
   if ! [ -d "$install_path/versions/node/$version" ]; then
     format_red "Version $version not installed"
     exit 1
   fi
 
-  is_sudo mkdir -p $bin_path
-
   anm_deactivate $current_active
 
   echo "Activating NodeJs version: $version"
 
-  if [ -f "$binary_folder/node" ]; then
-    is_sudo ln -s $binary_folder/node $bin_path/node
-  fi
-  if [ -f "$binary_folder/npm" ]; then
-    is_sudo ln -s $binary_folder/npm $bin_path/npm
-  fi
-  if [ -f "$binary_folder/npx" ]; then
-    is_sudo ln -s $binary_folder/npx $bin_path/npx
+  if [ -d "$binary_folder" ]; then
+    is_sudo symlink "$binary_folder" "$install_path/versions/current"
   fi
 
   if [ "$?" != 1 ]; then
     echo $version | is_sudo tee $install_path/active &> /dev/null
+  else
+    format_red "Error while activating node version $version\n"
+    exit 1
   fi
 }
 
@@ -220,13 +254,13 @@ anm_install() {
   local version=""
   case "$1" in
     "")
-      version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
+      version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
     "--lts")
       if [ "$2" ]; then
         lts_name="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
-        version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
+        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
       else
-        version="$(python3 $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
+        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
       fi;;
     *)
       version="$(parse_version $1)"
@@ -247,7 +281,18 @@ anm_install() {
 
   is_sudo mkdir -p "$node_install_dir"
 
-  download_filename="node-$version-$node_arch.tar.xz"
+  if windows; then
+    download_filename="node-$version-win-x64"
+    extension="zip"
+  elif linux; then
+    download_filename="node-$version-$node_arch"
+    extension="tar.xz"
+  elif darwin; then
+    download_filename="node-$version-darwin-(arm64 or x64)"
+    extension="tar.xz"
+    format_red "macOS not supported as yet."
+    exit 1
+  fi
   download_link="$(get_download_link $version)"
 
   # if ! wget -q --method=HEAD $download_link; then
@@ -261,10 +306,22 @@ anm_install() {
   echo
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
-  wget -O "/tmp/$download_filename" $download_link
+  # wget -O "/tmp/$download_filename" $download_link
+  curl $download_link --output "$anm_dir/versions/node/$download_filename.$extension"
 
   echo "Extracting nodejs to $node_install_dir"
-  is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
+  if windows; then
+    unzip -q "$anm_dir/versions/node/$download_filename.$extension" -d "$anm_dir/versions/node"
+    rm -rf "$node_install_dir"
+    mv "$anm_dir/versions/node/$download_filename" "$node_install_dir"
+    rm "$anm_dir/versions/node/$download_filename.$extension"
+  else
+    # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
+    is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$extension" \
+      -C $node_install_dir \
+      --strip-components=1
+    rm $anm_dir/versions/node/$download_filename.$extension
+  fi
 
   echo "$version" | is_sudo tee -a $anm_dir/installed &> /dev/null
 

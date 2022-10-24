@@ -3,31 +3,37 @@
 ![version](https://img.shields.io/github/v/tag/anujdatar/anm?label=version&sort=semver)
 
 A simple and lightweight alternative to
-[Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Also works for ARM
-based systems, supported architectures armv6l, armv7l, arm64, amd64 (x86_64).
+[Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) for Windows and Linux. Supported architectures armv6l, armv7l, arm64, amd64 (x86_64) for Linux and x64 on Windows. macOS support will be added shortly.
 
-> Wanted something to setup my SBC server projects without the overhead of nvm-sh.
+> Wanted something to setup my SBC server projects without the overhead of nvm-sh, and I had issues with NVM for Windows.
 
-Should technically work on Debian, Fedora, and Arch based systems. Testing being
-conducted on Ubuntu, Fedora, and Manjaro.
+Works on Windows, Debian, Fedora, and Arch based systems. Testing being
+conducted on Windows 11, Ubuntu, Fedora, and Manjaro. Only tested using git-bash on Windows. Launching in Powershell will spawn a git-bash subprocess.
 - Test Systems:
-  - X86_64 PC: Ubuntu, Fedora and Manjaro
+  - X86_64 PC: Windows11, Ubuntu 20.04 and 22.04, Fedora 36 and Manjaro
   - Raspberry PI 3B, 4B: Raspberry Pi OS, Ubuntu, Manjaro
   - Rock64, RockPro64: Armbian, Manjaro
   - Pinebook Pro: Manjaro
 
-Only works for Node.js versions with specific distributions for Linux:
+Compatibility for Linux:
  - Node v0.8.6+ (x86, x86_64)
  - Node v4.0.0+ (armv6l, armv7l, arm64)
 
+## Before Installing
+1. For Windows: this utility cannot install dependencies for windows. These will have to be installed manually.
+  - Please install Python version 3.8 or higher
+  - And, Git-scm for windows
+2. For Linux: this utility will check and automatically install all dependencies: python, pip, git, curl and wget.
+
 ## Install
-1. Install to default user-space. This should install to `/home/$USER/.anm`
+1. Install to default user-space (for Windows and Linux). This should install to `/home/$USER/.anm`
   ```
   curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
   ```
   ```
   wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
   ```
+  > For Windows: launch in git-bash for best results and use the `curl` version, git bash does not have wget.
 
 2. Install ANM system-wide, for all users. This should install to /opt/anm. Use the following:
   ```
@@ -36,7 +42,7 @@ Only works for Node.js versions with specific distributions for Linux:
   ```
   wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
   ```
-  > NOTE: most ANM actions, and node (npm install -g) will require `sudo` privileges.
+  > NOTE: For Linux only. And, most ANM actions, and `npm install -g` will require `sudo` privileges.
 
 3. Custom location:
     - Clone git repository
@@ -44,23 +50,40 @@ Only works for Node.js versions with specific distributions for Linux:
     - Run the install script. `./install.sh`
 
 4. If you want to use the script without installing, just clone the repository,
-install dependencies above, create files named `installed` and `active`. Make
+install dependencies mentioned above, create files named `installed` and `active`. Make
 `anm.sh` and executable file `chmod +x anm.sh`. You should now be able to run
 ANM from the directory `./anm.sh ls-remote`, `./anm.sh install --lts`, etc.
 
 The convenience script does the following in case you want to install manually.
   1. Update/upgrade system
-  2. Install missing dependencies using your package manager (apt/dnf/pacman)
+  2. Install missing dependencies using your package manager (apt/dnf/pacman) (on Linux only)
     - `curl`, `wget`, `git`, `jq`, `python3`, `python3-pip` (`python-pip` if using Arch). Ironically you need either `curl` or `wget` to get started. 😝
-  3. Install `packaging` (a python package) using `pip`. `pip install packaging`
-  4. Clones the [ANM git repo](https://github.com/anujdatar/anm) to `/home/$USER/.anm` or `/opt/anm`. This step is skipped if you are installing from the repo-clone.
-  5. Makes `anm.sh` an executable (`chmod +x /<path>/anm.sh`). And creates a symlink in `/home/$USER/.local/bin` or `/opt/anm` depending on the install location (`ln -s /<path>/anm.sh /<bin_path>/anm`).
-  6. Add `export $ANM_DIR=/<install_path>/` to your shell rc profile (`.bashrc`, `.zshrc`, `.profile`, `/etc/profile.d/anm_profile.sh`). This is required for anm detect install location and work correctly. Currently `bash` and `zsh` are supported. Other shell users should make sure `$HOME/.profile` and/or `/etc/profile` are loaded when shell is launched.
+  3. Install `packaging` and `urllib3` using `pip`. `pip install packaging urllib3`
+  4. Clones the [ANM git repo](https://github.com/anujdatar/anm) to `$HOME/.anm` (Windows and Linux).
+    - `/opt/anm` if Linux-system-wide-installation. This step is skipped if you are installing from the repo-clone.
+  5. Makes `anm.sh` an executable (`chmod +x /<path>/anm.sh`). And creates a symlink in `$HOME/.anm/bin`
+     - `ln -s $HOME/.anm/anm.sh $HOME/.anm/bin/anm`
+     - or `/opt/anm/bin` if system-wide install on Linux
+  6. Adds the following to your shell rc profile (`.bashrc`, `.zshrc`, `.profile`). This is required for anm detect install location and work correctly.
+    ```bash
+    # >>>>>>>> Block added by ANM install >>>>>>>>
+    if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
+    [ -d "$install_path/bin" ] && export PATH="$install_path/bin:$PATH"
+    fi
+
+    if ! [[ "$PATH" =~ "$install_path/versions/current" ]]; then
+    [ -d "$install_path/bin" ] && export PATH="$install_path/versions/current:$PATH"
+    fi
+
+    if [ -d "$install_path" ]; then export ANM_DIR="$install_path"; fi
+    # >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>
+    ```
+    - or `/etc/profile.d/anm_profile.sh`, if systen-wide installation on Linux
+    - For Windows `$HOME/.bashrc` is used by default. this is used by git-bash
+    - Currently `bash` (Windows and Linux) and `zsh` (Linux) are supported. Other shell users should make sure `$HOME/.profile` and/or `/etc/profile` are loaded when shell is launched.
 
 You might have to restart your system, or logout and log back in, or just close shell and reopen. Depends. You
 should be able to use anm from command line after this.
-
-> Note: If installing only to your userspace, step 5 also checks if `$HOME/.local/bin` is in path. If not, it adds that to your shell rc profile.
 
 ## Uninstall
 Unfortunately this has to be manual for now
@@ -68,10 +91,8 @@ Unfortunately this has to be manual for now
     ```
     rm -rf /home/$USER/.anm
     ```
-  2. Remove symlink
-    ```
-    rm /home/$USER/.local/bin/anm
-    ```
+  2. Remove the block added by ANM from your RC file (`$HOME/.bashrc` or `$HOME/.zshrc` or `$HOME/.profile`). Or delete `/etc/profile.d/anm_profile.sh` for system-wide installation on Linux
+
 
 ## Usage
 1. List locally installed node versions / releases. Should tell you active version as well.
@@ -137,6 +158,7 @@ Unfortunately this has to be manual for now
 
 ## TODO:
 1. Look into aliasing installed node versions
+2. Add macOS support
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.

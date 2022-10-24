@@ -4,6 +4,7 @@ installed
 active
 path
 versions/
+bin/
 
 # environment
 .env
