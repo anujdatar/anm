@@ -174,6 +174,7 @@
         *bash*);;
         *zsh*) RC_FILE="$HOME/.zshrc";;
         *) RC_FILE="$HOME/.profile";;
+      esac
     fi
   fi
 
