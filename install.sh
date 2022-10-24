@@ -191,6 +191,11 @@
       fi
     fi
   }
+  add_to_rc() {
+    ### add string to rc-file
+    ### Usage: add_to_rc [string]
+    echo $1 | is_sudo tee -a $RC_FILE
+  }
 
   # install pip dependencies
   echo "Installing pip dependencies: packaging urllib3"
