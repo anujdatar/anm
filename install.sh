@@ -7,6 +7,8 @@
   # OS detection functions
   linux() { [[ "$OSTYPE" == "linux-gnu"* ]]; }
   darwin() { [[ "$OSTYPE" == "darwin"* ]]; }
+  cygwin() { [[ "$OSTYPE" == "cygwin"* ]]; }
+  mingw() { [[ "$OSTYPE" == "msys"* ]]; }
   windows() { [ -n "$WINDIR" ]; }
 
   # some text color formatting functions
