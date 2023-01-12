@@ -7,6 +7,8 @@
   # OS detection functions
   linux() { [[ "$OSTYPE" == "linux-gnu"* ]]; }
   darwin() { [[ "$OSTYPE" == "darwin"* ]]; }
+  cygwin() { [[ "$OSTYPE" == "cygwin"* ]]; }
+  mingw() { [[ "$OSTYPE" == "msys"* ]]; }
   windows() { [ -n "$WINDIR" ]; }
 
   # some text color formatting functions
@@ -159,23 +161,28 @@
 
   # set install path and rc_file location
   install_path="$HOME/.anm"
-  RC_FILE="$HOME/.bashrc"
+  # RC_FILE="$HOME/.bashrc"
 
-  if windows; then
-    echo "MinGW / CygWin detected. Setting up for windows"
-  elif linux; then
+  case "$SHELL" in
+    *bash*) RC_FILE="$HOME/.bashrc";;
+    *zsh*) RC_FILE="$HOME/.zshrc";;
+    *) RC_FILE="$HOME/.profile";;
+  esac
+
+  if cygwin; then
+    echo "Cygwin detected, setting up for Windows+Cygwin"
+    install_path="/cygdrive/c/Users/$USER/.anm"
+  fi
+  if linux; then
     if [ "$1" = "system" ]; then
       echo "Installing ANM for all users"
       install_path="/opt/anm"
       RC_FILE="/etc/profile.d/anm_profile.sh"
     else
       echo "Installing ANM for user $USER"
-      case "$SHELL" in
-        *bash*);;
-        *zsh*) RC_FILE="$HOME/.zshrc";;
-        *) RC_FILE="$HOME/.profile";;
-      esac
     fi
+  else
+    echo "Installing ANM for user $USER"
   fi
 
   is_sudo() {

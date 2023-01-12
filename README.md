@@ -21,7 +21,7 @@ Works on Windows, Debian, Fedora, and Arch based systems. Testing being conducte
 ### Before Installing
 1. For Windows: this utility cannot install dependencies for windows. These will have to be installed manually.
    - Please install [`python`](https://www.python.org/) version 3.8 or higher
-   - And, [`git-scm`](https://git-scm.com/) for windows
+   - And, [`git-scm`](https://git-scm.com/) for windows (for `git-bash`), or `cygwin`. Does not work in PowerShell.
    - Enable developer mode in Windows settings. This lets you make symbolic links (`mklink`) without admin privilege.
   ![enable-dev-mode](/images/enable-dev-mode.png)
 2. For Linux: this utility will check and automatically install all dependencies: python, pip, git, curl and wget.
@@ -54,46 +54,6 @@ Works on Windows, Debian, Fedora, and Arch based systems. Testing being conducte
 install dependencies mentioned above, create files named `installed` and `active`. Make
 `anm.sh` and executable file `chmod +x anm.sh`. You should now be able to run
 ANM from the directory `./anm.sh ls-remote`, `./anm.sh install --lts`, etc.
-
-The convenience script does the following in case you want to install manually.
-   1. Update/upgrade system
-   2. Install missing dependencies using your package manager (apt/dnf/pacman) (on Linux only)
-    - `curl`, `wget`, `git`, `jq`, `python3`, `python3-pip` (`python-pip` if using Arch). Ironically you need either `curl` or `wget` to get started. 😝
-   3. Install `packaging` and `urllib3` using `pip`. `pip install packaging urllib3`
-   4. Clone the [ANM git repo](https://github.com/anujdatar/anm) to `$HOME/.anm` (Windows and Linux).
-      - `/opt/anm` if Linux-system-wide-installation. This step is skipped if you are installing from the repo-clone.
-   5. Makes `anm.sh` an executable (`chmod +x /<path>/anm.sh`). And creates a symlink in `$HOME/.anm/bin`
-      - `ln -s $HOME/.anm/anm.sh $HOME/.anm/bin/anm`
-      - or `/opt/anm/bin` if system-wide install on Linux
-  6. Adds the following to your shell rc profile (`.bashrc`, `.zshrc`, `.profile`). This is required for anm detect install location and work correctly.
-      ```bash
-      # >>>>>>>> Block added by ANM install >>>>>>>>
-      if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
-      [ -d "$install_path/bin" ] && export PATH="$install_path/bin:$PATH"
-      fi
-
-      if ! [[ "$PATH" =~ "$install_path/versions/current" ]]; then
-      [ -d "$install_path/bin" ] && export PATH="$install_path/versions/current:$PATH"
-      fi
-
-      if [ -d "$install_path" ]; then export ANM_DIR="$install_path"; fi
-      # >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>
-      ```
-      - or `/etc/profile.d/anm_profile.sh`, if systen-wide installation on Linux
-      - For Windows `$HOME/.bashrc` is used by default. this is used by git-bash
-      - Currently `bash` (Windows and Linux) and `zsh` (Linux) are supported. Other shell users should make sure `$HOME/.profile` and/or `/etc/profile` are loaded when shell is launched.
-
-You might have to restart your system, or logout and log back in, or just close shell and reopen. Depends. You
-should be able to use anm from command line after this.
-
-## Uninstall
-Unfortunately this has to be manual for now
-  1. Remove the installed directory
-    ```
-    rm -rf /home/$USER/.anm
-    ```
-  2. Remove the block added by ANM from your RC file (`$HOME/.bashrc` or `$HOME/.zshrc` or `$HOME/.profile`). Or delete `/etc/profile.d/anm_profile.sh` for system-wide installation on Linux
-
 
 ## Usage
 
@@ -158,6 +118,57 @@ Unfortunately this has to be manual for now
    ```
    anm --help       # print help message
    ```
+
+## More on Installation
+The convenience script does the following in case you want to install manually.
+   1. Update/upgrade system
+   2. Install missing dependencies using your package manager (apt/dnf/pacman) (on Linux only)
+    - `curl`, `wget`, `git`, `jq`, `python3`, `python3-pip` (`python-pip` if using Arch). Ironically you need either `curl` or `wget` to get started. 😝
+   3. Install `packaging` and `urllib3` using `pip`. `pip install packaging urllib3`
+   4. Clone the [ANM git repo](https://github.com/anujdatar/anm) to `$HOME/.anm` (Windows and Linux).
+      - `/opt/anm` if Linux-system-wide-installation. This step is skipped if you are installing from the repo-clone.
+   5. Makes `anm.sh` an executable (`chmod +x /<path>/anm.sh`). And creates a symlink in `$HOME/.anm/bin`
+      - `ln -s $HOME/.anm/anm.sh $HOME/.anm/bin/anm`
+      - or `/opt/anm/bin` if system-wide install on Linux
+  6. Adds the following to your shell rc profile (`.bashrc`, `.zshrc`, `.profile`). This is required for anm detect install location and work correctly.
+      ```bash
+      # >>>>>>>> Block added by ANM install >>>>>>>>
+      if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
+      [ -d "$install_path/bin" ] && export PATH="$install_path/bin:$PATH"
+      fi
+
+      if ! [[ "$PATH" =~ "$install_path/versions/current" ]]; then
+      [ -d "$install_path/bin" ] && export PATH="$install_path/versions/current:$PATH"
+      fi
+
+      if [ -d "$install_path" ]; then export ANM_DIR="$install_path"; fi
+      # >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>
+      ```
+      - or `/etc/profile.d/anm_profile.sh`, if system-wide installation on Linux
+      - Currently `bash` and `zsh` are supported. Other shell users should make sure `$HOME/.profile` and/or `/etc/profile` are loaded when shell is launched.
+
+> **Note**: On Windows, the default installation directory is `C:\Users\<username>\anm` regardless of if you are using `git-bash`
+> (which is `mingw` I believe) or if you have `cygwin` installed separately (in `C:\cygwin`). But the rc file that gets
+> updated will depend on the terminal emulator you use. If you use `git-bash` your rc file should be
+> `C:\Users\<username>\.bashrc` or `C:\Users\<username>\.zshrc`. But if you use `cygwin` you default might be
+> `C:\cygwin64\home\<username>\.bashrc` or `C:\cygwin64\home\<username>\.zshrc`. So if you want it to operate in both
+> environments, you will have to add the block to the other rc files manually.
+>
+> In your rc files on `git-bash`/`mingw` you install path should look like `/c/Users/<username>/.anm`.
+> Whereas on `cygwin` it should be `/cygdrive/c/Users/<username>/.anm` so the block above may look different and also needs to be that way.
+> All installed nodejs versions will be stored in the `/.anm/versions/node/` directory.
+> Default`corepack` binary does not seem to work on Windows in `cygwin` at the moment. `crlf` vs `lf` line ending issue. Works in `git-bash` (`mingw`) though.
+
+You might have to restart your system, or logout and log back in, or just close shell and reopen. Depends. You
+should be able to use anm from command line after this.
+
+## Uninstall
+Unfortunately this has to be manual for now
+  1. Remove the installed directory
+    ```
+    rm -rf /home/$USER/.anm
+    ```
+  2. Remove the block added by ANM from your RC file (`$HOME/.bashrc` or `$HOME/.zshrc` or `$HOME/.profile`). Or delete `/etc/profile.d/anm_profile.sh` for system-wide installation on Linux
 
 ## TODO:
 1. Look into aliasing installed node versions
