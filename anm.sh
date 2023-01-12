@@ -315,6 +315,12 @@ anm_install() {
     rm -rf "$node_install_dir"
     mv "$anm_dir/versions/node/$download_filename" "$node_install_dir"
     rm "$anm_dir/versions/node/$download_filename.$extension"
+
+    # making all nodejs binaries executable for Cygwin compatibility
+    chmod +x "$node_install_dir/node.exe"
+    chmod +x "$node_install_dir/npm"
+    chmod +x "$node_install_dir/npx"
+    chmod +x "$node_install_dir/corepack"
   else
     # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
     is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$extension" \
