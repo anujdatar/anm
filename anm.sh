@@ -22,6 +22,16 @@ format_yellow() {
   echo -en "\e[33m$1\e[0m"
 }
 
+parse_version() {
+  local version_1=$1
+
+  if [[ $version_1 == v* ]]; then
+    echo "$version_1"
+  else
+    echo "v$version_1"
+  fi
+}
+
 symlink() {
   ### Create symbolic links ###
   ### Usage: mklink "original-path" "link-path" ###
@@ -36,6 +46,25 @@ symlink() {
   else
     ln -s "$1" "$2"
   fi
+}
+
+get_anm_install_location() {
+  ### get ANM install location (folder)
+  if [ -d "$ANM_DIR" ]; then
+    echo "$ANM_DIR"
+  else
+    echo "$(pwd)"
+    touch "$(pwd)/active"
+    touch "$(pwd)/installed"
+    mkdir -p "$(pwd)/versions/node"
+  fi
+}
+
+get_bin_path() {
+  ### get path of the anm bin folder
+  local install_path="$(get_anm_install_location)"
+
+  echo "$install_path/bin"
 }
 
 # set which python keyword to use
