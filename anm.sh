@@ -76,7 +76,6 @@ fi
 
 get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
-  # TODO: add Darwin detection
   if windows; then
     EXT="zip"
     node_arch="win-x64-zip"
@@ -99,11 +98,11 @@ get_sys_node_arch() {
         exit 1;;
     esac
   elif darwin; then
-    echo "macOS not supported yet. Coming soon though"
-    exit 1
-  fi
-}
-
+    EXT="tar.xz"
+    case "$(uname -m)" in
+      x86_64)
+        node_arch="osx-x64"
+        filename_suffix="darwin-x64";;
       arm64)
         node_arch="osx-arm64"
         filename_suffix="darwin-arm64";;
