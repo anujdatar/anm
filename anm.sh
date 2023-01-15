@@ -78,17 +78,23 @@ get_sys_node_arch() {
   ### get system arch, return strings that nodejs website uses ###
   # TODO: add Darwin detection
   if windows; then
+    EXT="zip"
     node_arch="win-x64-zip"
+    filename_suffix="win-x64"
   elif linux; then
+    EXT="tar.xz"
     case "$(uname -m)" in
       x86_64)
-        node_arch="linux-x64";;
+        node_arch="linux-x64"
+        filename_suffix="linux-x64";;
       aarch64|arm64)
-        node_arch="linux-arm64";;
+        node_arch="linux-arm64"
+        filename_suffix="linux-arm64";;
       armhf)
-        node_arch="linux-armv7l";;
+        node_arch="linux-armv7l"
+        filename_suffix="linux-armv7l";;
       *)
-        format_red "Unable to recognize system architecture\n"
+        format_red "System OS and architecture not supported by ANM\n"
         format_red "Please contact developer on GitHub for solution\n"
         exit 1;;
     esac
