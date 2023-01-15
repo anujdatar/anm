@@ -74,51 +74,42 @@ else
   PYTHON="python3"
 fi
 
-get_sys_node_arch() {
-  ### get system arch, return strings that nodejs website uses ###
-  if windows; then
-    EXT="zip"
-    node_arch="win-x64-zip"
-    filename_suffix="win-x64"
-  elif linux; then
-    EXT="tar.xz"
-    case "$(uname -m)" in
-      x86_64)
-        node_arch="linux-x64"
-        filename_suffix="linux-x64";;
-      aarch64|arm64)
-        node_arch="linux-arm64"
-        filename_suffix="linux-arm64";;
-      armhf)
-        node_arch="linux-armv7l"
-        filename_suffix="linux-armv7l";;
-      *)
-        format_red "System OS and architecture not supported by ANM\n"
-        format_red "Please contact developer on GitHub for solution\n"
-        exit 1;;
-    esac
-  elif darwin; then
-    EXT="tar.xz"
-    case "$(uname -m)" in
-      x86_64)
-        node_arch="osx-x64"
-        filename_suffix="darwin-x64";;
-      arm64)
-        node_arch="osx-arm64"
-        filename_suffix="darwin-arm64";;
-      *)
-        format_red "System OS and architecture not supported by ANM\n"
-        format_red "Please contact developer on GitHub for solution\n"
-        exit 1;;
-    esac
-  fi
-}
-
-get_sys_node_arch
-if [ "$?" = 1 ]; then
-  format_red "System OS and architecture not supported by ANM\n"
-  format_red "Please check compatibility or contact developer\n"
-  exit 1
+### get system arch, return strings that nodejs website uses ###
+if windows; then
+  EXT="zip"
+  node_arch="win-x64-zip"
+  filename_suffix="win-x64"
+elif linux; then
+  EXT="tar.xz"
+  case "$(uname -m)" in
+    x86_64)
+      node_arch="linux-x64"
+      filename_suffix="linux-x64";;
+    aarch64|arm64)
+      node_arch="linux-arm64"
+      filename_suffix="linux-arm64";;
+    armhf)
+      node_arch="linux-armv7l"
+      filename_suffix="linux-armv7l";;
+    *)
+      format_red "System OS and architecture not supported by ANM\n"
+      format_red "Please contact developer on GitHub for solution\n"
+      exit 1;;
+  esac
+elif darwin; then
+  EXT="tar.xz"
+  case "$(uname -m)" in
+    x86_64)
+      node_arch="osx-x64"
+      filename_suffix="darwin-x64";;
+    arm64)
+      node_arch="osx-arm64"
+      filename_suffix="darwin-arm64";;
+    *)
+      format_red "System OS and architecture not supported by ANM\n"
+      format_red "Please contact developer on GitHub for solution\n"
+      exit 1;;
+  esac
 fi
 
 get_download_link() {
