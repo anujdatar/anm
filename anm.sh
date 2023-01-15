@@ -100,10 +100,10 @@ elif darwin; then
   EXT="tar.xz"
   case "$(uname -m)" in
     x86_64)
-      node_arch="osx-x64"
+      node_arch="osx-x64-tar"
       filename_suffix="darwin-x64";;
     arm64)
-      node_arch="osx-arm64"
+      node_arch="osx-arm64-tar"
       filename_suffix="darwin-arm64";;
     *)
       format_red "System OS and architecture not supported by ANM\n"
