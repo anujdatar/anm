@@ -129,19 +129,11 @@ get_download_link() {
   fi
   local version="$(parse_version $1)"
 
-  local download_filename=""
-  if windows; then
-    download_filename="node-$version-win-x64.zip"
-  elif linux; then
-    download_filename="node-$version-$node_arch.tar.xz"
-  fi
+  download_filename="node-$version-$filename_suffix"
 
-  local base_link="https://nodejs.org/dist"
-  local version_page="$base_link/$version"
-  local download_link="$version_page/$download_filename"
+  local download_link="https://nodejs.org/dist/$version/$download_filename.$EXT"
   echo "$download_link"
 }
-
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
@@ -298,18 +290,6 @@ anm_install() {
 
   is_sudo mkdir -p "$node_install_dir"
 
-  if windows; then
-    download_filename="node-$version-win-x64"
-    extension="zip"
-  elif linux; then
-    download_filename="node-$version-$node_arch"
-    extension="tar.xz"
-  elif darwin; then
-    download_filename="node-$version-darwin-(arm64 or x64)"
-    extension="tar.xz"
-    format_red "macOS not supported as yet."
-    exit 1
-  fi
   download_link="$(get_download_link $version)"
 
   # if ! wget -q --method=HEAD $download_link; then
@@ -324,14 +304,14 @@ anm_install() {
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
   # wget -O "/tmp/$download_filename" $download_link
-  curl $download_link --output "$anm_dir/versions/node/$download_filename.$extension"
+  curl $download_link --output "$anm_dir/versions/node/$download_filename.$EXT"
 
   echo "Extracting nodejs to $node_install_dir"
   if windows; then
-    unzip -q "$anm_dir/versions/node/$download_filename.$extension" -d "$anm_dir/versions/node"
+    unzip -q "$anm_dir/versions/node/$download_filename.$EXT" -d "$anm_dir/versions/node"
     rm -rf "$node_install_dir"
     mv "$anm_dir/versions/node/$download_filename" "$node_install_dir"
-    rm "$anm_dir/versions/node/$download_filename.$extension"
+    rm "$anm_dir/versions/node/$download_filename.$EXT"
 
     # making all nodejs binaries executable for Cygwin compatibility
     chmod +x "$node_install_dir/node.exe"
@@ -340,10 +320,10 @@ anm_install() {
     chmod +x "$node_install_dir/corepack"
   else
     # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
-    is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$extension" \
+    is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$EXT" \
       -C $node_install_dir \
       --strip-components=1
-    rm $anm_dir/versions/node/$download_filename.$extension
+    rm $anm_dir/versions/node/$download_filename.$EXT
   fi
 
   echo "$version" | is_sudo tee -a $anm_dir/installed &> /dev/null
