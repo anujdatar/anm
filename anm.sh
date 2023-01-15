@@ -104,13 +104,14 @@ get_sys_node_arch() {
   fi
 }
 
-parse_version() {
-  local version_1=$1
-
-  if [[ $version_1 == v* ]]; then
-    echo "$version_1"
-  else
-    echo "v$version_1"
+      arm64)
+        node_arch="osx-arm64"
+        filename_suffix="darwin-arm64";;
+      *)
+        format_red "System OS and architecture not supported by ANM\n"
+        format_red "Please contact developer on GitHub for solution\n"
+        exit 1;;
+    esac
   fi
 }
 
@@ -142,24 +143,6 @@ get_download_link() {
   echo "$download_link"
 }
 
-get_anm_install_location() {
-  ### get ANM install location (folder)
-  if [ -d "$ANM_DIR" ]; then
-    echo "$ANM_DIR"
-  else
-    echo "$(pwd)"
-    touch "$(pwd)/active"
-    touch "$(pwd)/installed"
-    mkdir -p "$(pwd)/versions/node"
-  fi
-}
-
-get_bin_path() {
-  ### get path of the anm bin folder
-  local install_path="$(get_anm_install_location)"
-
-  echo "$install_path/bin"
-}
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
