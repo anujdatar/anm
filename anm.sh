@@ -253,17 +253,20 @@ anm_install() {
   local version=""
   case "$1" in
     "")
-      version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
+      get_version="latest";;
     "--lts")
       if [ "$2" ]; then
-        lts_name="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
-        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
+        get_version="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
       else
-        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
+        get_version="latest_lts"
       fi;;
     *)
-      version="$(parse_version $1)"
+      version="$(parse_version $1)";;
   esac
+
+  if [ "$get_version" ]; then
+    version="$(list_compat_node_versions "latest_version_number" $get_version)"
+  fi
 
   if [ "$?" = 1 ]; then
     format_red "Unable to find version: $2\n"
