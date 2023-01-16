@@ -13,13 +13,13 @@ windows() { [ -n "$WINDIR" ]; }
 # some text color formatting functions
 format_red() {
   ### Usage: format_dist "string", use \n at the end for linebreak ###
-  echo -en "\e[31m$1\e[0m"
+  printf "\e[31m$1\e[0m"
 }
 format_green() {
-  echo -en "\e[32m$1\e[0m"
+  printf "\e[32m$1\e[0m"
 }
 format_yellow() {
-  echo -en "\e[33m$1\e[0m"
+  printf "\e[33m$1\e[0m"
 }
 
 parse_version() {
