@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ANM_VERSION="3.1.1"
+ANM_VERSION="3.1.2"
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
