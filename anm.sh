@@ -112,6 +112,17 @@ elif darwin; then
   esac
 fi
 
+get_download_filename() {
+  ### construct download filename string
+  if [ "$1" = "" ]; then
+    format_red "No node version provided for download\n"
+    exit 1
+  fi
+  local version="$(parse_version $1)"
+
+  echo "node-$version-$filename_suffix"
+}
+
 get_download_link() {
   ### construct the download link string
   if [ "$1" = "" ]; then
@@ -120,10 +131,13 @@ get_download_link() {
   fi
   local version="$(parse_version $1)"
 
-  download_filename="node-$version-$filename_suffix"
+  if [ "$2" = "" ]; then
+    format_red "No filename provided for download\n"
+    exit 1
+  fi
+  local download_filename="$2"
 
-  local download_link="https://nodejs.org/dist/$version/$download_filename.$EXT"
-  echo "$download_link"
+  echo "https://nodejs.org/dist/$version/$download_filename.$EXT"
 }
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
@@ -283,7 +297,8 @@ anm_install() {
 
   is_sudo mkdir -p "$node_install_dir"
 
-  download_link="$(get_download_link $version)"
+  local download_filename="$(get_download_filename $version)"
+  local download_link="$(get_download_link $version $download_filename)"
 
   # if ! wget -q --method=HEAD $download_link; then
   if ! curl --output /dev/null --silent --head --fail "$download_link"; then
