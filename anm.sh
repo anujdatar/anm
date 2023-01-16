@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ANM_VERSION="3.0.0"
+ANM_VERSION="3.1.0"
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
@@ -128,34 +128,33 @@ get_download_link() {
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
-ls_all() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "ls_all"
-}
-ls_lts() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "ls_lts"
-}
-ls_latest() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "ls_latest"
-}
-ls_latest_lts_version_data_by_name() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
-}
-latest_lts_version_number() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $1
+list_compat_node_versions() {
+  ### List compatible versions of node for your system
+  ### Usage: list_compat_node_version [...options]
+  ###         ls_all: list all compatible versions
+  ###         ls_latest: list latest release of each version
+  ###         ls_lts: list all compatible LTS versions
+  ###         lts_latest_data <lts_name>: latest release details of given LTS name
+  ### .       latest_version_number [latest/lts_name]: latest release or LTS version number
+  $PYTHON $python_script_path $node_dist_index $node_arch $@
 }
 
 anm_ls_remote() {
   case "$1" in
     "--lts")
       if [ "$2" ]; then
-        ls_latest_lts_version_data_by_name $2
+        # latest release of LTS for given codename
+        list_compat_node_versions "lts_latest_data" $2
       else
-        ls_lts
+        # latest release for all LTS versions
+        list_compat_node_versions "ls_lts"
       fi;;
     "--latest")
-      ls_latest;;
+      # latest release for all node versions
+      list_compat_node_versions "ls_latest";;
     "")
-      ls_all;;
+      # all compatible node versions
+      list_compat_node_versions "ls_all";;
   esac
 }
 
@@ -254,17 +253,20 @@ anm_install() {
   local version=""
   case "$1" in
     "")
-      version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "")";;
+      get_version="latest";;
     "--lts")
       if [ "$2" ]; then
-        lts_name="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
-        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $lts_name)"
+        get_version="$(echo "$2" | tr '[:upper:]' '[:lower:]')"
       else
-        version="$($PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" "latest_lts")"
+        get_version="latest_lts"
       fi;;
     *)
-      version="$(parse_version $1)"
+      version="$(parse_version $1)";;
   esac
+
+  if [ "$get_version" ]; then
+    version="$(list_compat_node_versions "latest_version_number" $get_version)"
+  fi
 
   if [ "$?" = 1 ]; then
     format_red "Unable to find version: $2\n"
@@ -350,9 +352,18 @@ anm_uninstall() {
   echo "anm use <version number>    # v16.15.0, v12.22.12, etc"
 }
 
+anm_upgrade() {
+  local CURRENT_DIR="$(pwd)"
+  local install_path="$(get_anm_install_location)"
+  cd $install_path
+  git pull
+  cd $CURRENT_DIR
+}
+
 print_help() {
   echo; echo "Another Node Manager ($ANM_VERSION)"
   echo "Usage: anm [command] [options...]"; echo
+  echo "    anm upgrade               # upgrade ANM to latest version"; echo
   echo "    anm ls                    # List locally installed NodeJs versions"; echo
   echo "    anm ls-remote             # List node versions available for install from www.nodejs.org"
   echo "        --lts                 # List LTS versions of node available for install"
@@ -378,6 +389,8 @@ print_help() {
 
 anm() {
   case $1 in
+    "upgrade")
+      anm_upgrade;;
     "ls")
       anm_ls;;
     "ls-remote")

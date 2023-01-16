@@ -115,6 +115,9 @@ ANM from the directory `./anm.sh ls-remote`, `./anm.sh install --lts`, etc.
    ```
 7. Other misc. commands
    ```
+   anm upgrade      # upgrade to latest ANM version
+   ```
+   ```
    anm --version    # print version of ANM that is installed
    ```
    ```
@@ -177,7 +180,6 @@ Unfortunately this has to be manual for now
 
 ## TODO:
 1. Look into aliasing installed node versions
-2. Upgrade command ANM itself
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.
