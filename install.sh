@@ -161,7 +161,6 @@
 
   # set install path and rc_file location
   install_path="$HOME/.anm"
-  # RC_FILE="$HOME/.bashrc"
 
   case "$SHELL" in
     *bash*) RC_FILE="$HOME/.bashrc";;
@@ -218,24 +217,27 @@
   echo "ANM install path: $install_path"
 
   # add bin path and ANM_DIR to rc file
-  if ! [[ "$PATH" =~ "$install_path/bin" ]]; then
-    echo "Adding $install_path/bin to path, added the following to $RC_FILE"
+  case $PATH in
+    *"$install_path/bin"*)
+      echo "$install_path/bin already in PATH. Skipping step";;
+    *)
+      echo "Adding $install_path/bin to path, added the following to $RC_FILE"
 
-    add_to_rc "# >>>>>>>> Block added by ANM install >>>>>>>>"
-    add_to_rc "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then"
-    add_to_rc "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/bin:\$PATH\""
-    add_to_rc "fi"
+      add_to_rc "# >>>>>>>> Block added by ANM install >>>>>>>>"
+      add_to_rc "if ! [[ \"\$PATH\" =~ \"$install_path/bin\" ]]; then"
+      add_to_rc "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/bin:\$PATH\""
+      add_to_rc "fi"
 
-    add_to_rc "if ! [[ \"\$PATH\" =~ \"$install_path/versions/current\" ]]; then"
-    add_to_rc "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/versions/current:\$PATH\""
-    add_to_rc "fi"
+      add_to_rc "if ! [[ \"\$PATH\" =~ \"$install_path/versions/current\" ]]; then"
+      add_to_rc "[ -d \"$install_path/bin\" ] && export PATH=\"$install_path/versions/current:\$PATH\""
+      add_to_rc "fi"
 
-    add_to_rc "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
-    add_to_rc "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
+      add_to_rc "if [ -d \"$install_path\" ]; then export ANM_DIR=\"$install_path\"; fi"
+      add_to_rc "# >>>>>>>>>>>>>> End ANM block >>>>>>>>>>>>>>>"
 
-    echo -e "\nShould work directly for Bash, Zsh, and Git Bash for windows"
-    echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file"
-  fi
+      echo -e "\nShould work directly for Bash, Zsh, and Git Bash for windows"
+      echo "For other shells (on Linux), please ensure $HOME/.profile is included in rc file";;
+  esac
 
   # make sure anm.sh is executable
   is_sudo chmod +x ${install_path}/anm.sh
