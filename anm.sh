@@ -128,34 +128,33 @@ get_download_link() {
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
 
-ls_all() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "ls_all"
-}
-ls_lts() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "ls_lts"
-}
-ls_latest() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "ls_latest"
-}
-ls_latest_lts_version_data_by_name() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "lts_latest_data" $1
-}
-latest_lts_version_number() {
-  $PYTHON $python_script_path $node_dist_index $node_arch "latest_version_number" $1
+list_compat_node_versions() {
+  ### List compatible versions of node for your system
+  ### Usage: list_compat_node_version [...options]
+  ###         ls_all: list all compatible versions
+  ###         ls_latest: list latest release of each version
+  ###         ls_lts: list all compatible LTS versions
+  ###         lts_latest_data <lts_name>: latest release details of given LTS name
+  ### .       latest_version_number [latest/lts_name]: latest release or LTS version number
+  $PYTHON $python_script_path $node_dist_index $node_arch $@
 }
 
 anm_ls_remote() {
   case "$1" in
     "--lts")
       if [ "$2" ]; then
-        ls_latest_lts_version_data_by_name $2
+        # latest release of LTS for given codename
+        list_compat_node_versions "lts_latest_data" $2
       else
-        ls_lts
+        # latest release for all LTS versions
+        list_compat_node_versions "ls_lts"
       fi;;
     "--latest")
-      ls_latest;;
+      # latest release for all node versions
+      list_compat_node_versions "ls_latest";;
     "")
-      ls_all;;
+      # all compatible node versions
+      list_compat_node_versions "ls_all";;
   esac
 }
 
