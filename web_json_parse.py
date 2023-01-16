@@ -189,7 +189,7 @@ def print_latest_version_number(data, ver_name):
     lts_names_list = get_all_lts_names(data)
     latest_version_data = get_latest_all(nodeVersions)
 
-    if not ver_name:
+    if ver_name == 'latest':
         latest_version = {}
         for item in latest_version_data:
             if not latest_version:
