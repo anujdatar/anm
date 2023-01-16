@@ -352,9 +352,18 @@ anm_uninstall() {
   echo "anm use <version number>    # v16.15.0, v12.22.12, etc"
 }
 
+anm_upgrade() {
+  local CURRENT_DIR="$(pwd)"
+  local install_path="$(get_anm_install_location)"
+  cd $install_path
+  git pull
+  cd $CURRENT_DIR
+}
+
 print_help() {
   echo; echo "Another Node Manager ($ANM_VERSION)"
   echo "Usage: anm [command] [options...]"; echo
+  echo "    anm upgrade               # upgrade ANM to latest version"; echo
   echo "    anm ls                    # List locally installed NodeJs versions"; echo
   echo "    anm ls-remote             # List node versions available for install from www.nodejs.org"
   echo "        --lts                 # List LTS versions of node available for install"
@@ -380,6 +389,8 @@ print_help() {
 
 anm() {
   case $1 in
+    "upgrade")
+      anm_upgrade;;
     "ls")
       anm_ls;;
     "ls-remote")
