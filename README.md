@@ -3,16 +3,20 @@
 ![version](https://img.shields.io/github/v/tag/anujdatar/anm?label=version&sort=semver)
 
 A simple and lightweight alternative to
-[Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) for Linux and [NVM for Windows](https://github.com/coreybutler/nvm-windows). Supported architectures armv6l, armv7l, arm64, amd64 (x86_64) for Linux and x64 on Windows. macOS support will be added shortly.
+[Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) for Linux & macOS and [NVM for Windows](https://github.com/coreybutler/nvm-windows). Supported architectures:
+- Linux (armv6l, armv7l, arm64, amd64/x86_64
+- Windows (x86_64)
+- macOS (x86_64, arm64)
 
 > Wanted something to setup my SBC server projects without the overhead of nvm, and I had issues with NVM for Windows.
 
-Works on Windows, Debian, Fedora, and Arch based systems. Testing being conducted on Windows 11, Ubuntu, Fedora, and Manjaro. Only tested using git-bash on Windows. Launching in Powershell will spawn a git-bash subprocess.
+Works on macOS, Windows, Debian, Fedora, and Arch based systems. Only tested using git-bash (minGW) or Cygwin on Windows. Launching install script in Powershell will spawn a git-bash subprocess, the main anm script will not be added to powershell rc so that may not work directly.
 - Test Systems:
    - X86_64 PC: Windows11, Ubuntu 20.04 and 22.04, Fedora 36 and Manjaro
    - Raspberry PI 3B, 4B: Raspberry Pi OS, Ubuntu, Manjaro
    - Rock64, RockPro64: Armbian, Manjaro
    - Pinebook Pro: Manjaro
+   - macOS Ventura on M1 Macbook Air and an Intel Hackintosh
 
 - Compatibility for Linux:
    - Node v0.8.6+ (x86, x86_64)
@@ -25,25 +29,26 @@ Works on Windows, Debian, Fedora, and Arch based systems. Testing being conducte
    - Enable developer mode in Windows settings. This lets you make symbolic links (`mklink`) without admin privilege.
   ![enable-dev-mode](/images/enable-dev-mode.png)
 2. For Linux: this utility will check and automatically install all dependencies: python, pip, git, curl and wget.
+3. For macOS: I think you need to enable XCode CLI utils, accept the terms, so you can use git, python and pip.
 
 ## Install
-1. Install to default user-space (for Windows and Linux). This should install to `/home/$USER/.anm`
+1. Install to default user-space. This should install to `$HOME/.anm`
+   > For Windows: launch in git-bash for best results and use the `curl` version, git bash does not have wget.
    ```
    curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
     ```
    ```
    wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash
    ```
-   > For Windows: launch in git-bash for best results and use the `curl` version, git bash does not have wget.
 
 2. Install ANM system-wide, for all users. This should install to /opt/anm. Use the following:
+   > NOTE: For Linux only. And, most ANM actions, and `npm install -g` will require `sudo` privileges.
    ```
    curl -o- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
    ```
    ```
    wget -qO- https://raw.githubusercontent.com/anujdatar/anm/main/install.sh | bash -s system
    ```
-   > NOTE: For Linux only. And, most ANM actions, and `npm install -g` will require `sudo` privileges.
 
 3. Custom location:
    - Clone git repository
@@ -121,10 +126,10 @@ ANM from the directory `./anm.sh ls-remote`, `./anm.sh install --lts`, etc.
 
 ## More on Installation
 The convenience script does the following in case you want to install manually.
-   1. Update/upgrade system
+   1. Update/upgrade system (on Linux only)
    2. Install missing dependencies using your package manager (apt/dnf/pacman) (on Linux only)
     - `curl`, `wget`, `git`, `jq`, `python3`, `python3-pip` (`python-pip` if using Arch). Ironically you need either `curl` or `wget` to get started. 😝
-   3. Install `packaging` and `urllib3` using `pip`. `pip install packaging urllib3`
+   3. Install `packaging` and `urllib3` using `pip`. `pip3 install packaging urllib3`
    4. Clone the [ANM git repo](https://github.com/anujdatar/anm) to `$HOME/.anm` (Windows and Linux).
       - `/opt/anm` if Linux-system-wide-installation. This step is skipped if you are installing from the repo-clone.
    5. Makes `anm.sh` an executable (`chmod +x /<path>/anm.sh`). And creates a symlink in `$HOME/.anm/bin`
@@ -172,7 +177,7 @@ Unfortunately this has to be manual for now
 
 ## TODO:
 1. Look into aliasing installed node versions
-2. Add macOS support
+2. Upgrade command ANM itself
 
 ## Thanks
 Uses some ideas from [NVM](https://github.com/nvm-sh/nvm), but works differently.

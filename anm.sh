@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ANM_VERSION="2.0.1"
+ANM_VERSION="3.0.0"
 
 node_dist_index="https://nodejs.org/dist/index.json"
 
@@ -13,13 +13,23 @@ windows() { [ -n "$WINDIR" ]; }
 # some text color formatting functions
 format_red() {
   ### Usage: format_dist "string", use \n at the end for linebreak ###
-  echo -en "\e[31m$1\e[0m"
+  printf "\e[31m$1\e[0m"
 }
 format_green() {
-  echo -en "\e[32m$1\e[0m"
+  printf "\e[32m$1\e[0m"
 }
 format_yellow() {
-  echo -en "\e[33m$1\e[0m"
+  printf "\e[33m$1\e[0m"
+}
+
+parse_version() {
+  local version_1=$1
+
+  if [[ $version_1 == v* ]]; then
+    echo "$version_1"
+  else
+    echo "v$version_1"
+  fi
 }
 
 symlink() {
@@ -36,75 +46,6 @@ symlink() {
   else
     ln -s "$1" "$2"
   fi
-}
-
-# set which python keyword to use
-if windows; then
-  PYTHON="python"
-else
-  PYTHON="python3"
-fi
-
-get_sys_node_arch() {
-  ### get system arch, return strings that nodejs website uses ###
-  # TODO: add Darwin detection
-  if windows; then
-    node_arch="win-x64-zip"
-  elif linux; then
-    case "$(uname -m)" in
-      x86_64)
-        node_arch="linux-x64";;
-      aarch64|arm64)
-        node_arch="linux-arm64";;
-      armhf)
-        node_arch="linux-armv7l";;
-      *)
-        format_red "Unable to recognize system architecture\n"
-        format_red "Please contact developer on GitHub for solution\n"
-        exit 1;;
-    esac
-  elif darwin; then
-    echo "macOS not supported yet. Coming soon though"
-    exit 1
-  fi
-}
-
-parse_version() {
-  local version_1=$1
-
-  if [[ $version_1 == v* ]]; then
-    echo "$version_1"
-  else
-    echo "v$version_1"
-  fi
-}
-
-get_sys_node_arch
-if [ "$?" = 1 ]; then
-  format_red "System OS and architecture not supported by ANM\n"
-  format_red "Please check compatibility or contact developer\n"
-  exit 1
-fi
-
-get_download_link() {
-  ### construct the download link string
-  if [ "$1" = "" ]; then
-    format_red "No node version provided for download\n"
-    exit 1
-  fi
-  local version="$(parse_version $1)"
-
-  local download_filename=""
-  if windows; then
-    download_filename="node-$version-win-x64.zip"
-  elif linux; then
-    download_filename="node-$version-$node_arch.tar.xz"
-  fi
-
-  local base_link="https://nodejs.org/dist"
-  local version_page="$base_link/$version"
-  local download_link="$version_page/$download_filename"
-  echo "$download_link"
 }
 
 get_anm_install_location() {
@@ -124,6 +65,65 @@ get_bin_path() {
   local install_path="$(get_anm_install_location)"
 
   echo "$install_path/bin"
+}
+
+# set which python keyword to use
+if windows; then
+  PYTHON="python"
+else
+  PYTHON="python3"
+fi
+
+### get system arch, return strings that nodejs website uses ###
+if windows; then
+  EXT="zip"
+  node_arch="win-x64-zip"
+  filename_suffix="win-x64"
+elif linux; then
+  EXT="tar.xz"
+  case "$(uname -m)" in
+    x86_64)
+      node_arch="linux-x64"
+      filename_suffix="linux-x64";;
+    aarch64|arm64)
+      node_arch="linux-arm64"
+      filename_suffix="linux-arm64";;
+    armhf)
+      node_arch="linux-armv7l"
+      filename_suffix="linux-armv7l";;
+    *)
+      format_red "System OS and architecture not supported by ANM\n"
+      format_red "Please contact developer on GitHub for solution\n"
+      exit 1;;
+  esac
+elif darwin; then
+  EXT="tar.xz"
+  case "$(uname -m)" in
+    x86_64)
+      node_arch="osx-x64-tar"
+      filename_suffix="darwin-x64";;
+    arm64)
+      node_arch="osx-arm64-tar"
+      filename_suffix="darwin-arm64";;
+    *)
+      format_red "System OS and architecture not supported by ANM\n"
+      format_red "Please contact developer on GitHub for solution\n"
+      exit 1;;
+  esac
+fi
+
+get_download_link() {
+  ### construct the download link string
+  if [ "$1" = "" ]; then
+    format_red "No node version provided for download\n"
+    exit 1
+  fi
+  local version="$(parse_version $1)"
+
+  download_filename="node-$version-$filename_suffix"
+
+  local download_link="https://nodejs.org/dist/$version/$download_filename.$EXT"
+  echo "$download_link"
 }
 
 python_script_path="$(get_anm_install_location)/web_json_parse.py"
@@ -281,18 +281,6 @@ anm_install() {
 
   is_sudo mkdir -p "$node_install_dir"
 
-  if windows; then
-    download_filename="node-$version-win-x64"
-    extension="zip"
-  elif linux; then
-    download_filename="node-$version-$node_arch"
-    extension="tar.xz"
-  elif darwin; then
-    download_filename="node-$version-darwin-(arm64 or x64)"
-    extension="tar.xz"
-    format_red "macOS not supported as yet."
-    exit 1
-  fi
   download_link="$(get_download_link $version)"
 
   # if ! wget -q --method=HEAD $download_link; then
@@ -307,14 +295,14 @@ anm_install() {
   echo "Downloading nodejs version: $version from"
   echo "$download_link"; echo
   # wget -O "/tmp/$download_filename" $download_link
-  curl $download_link --output "$anm_dir/versions/node/$download_filename.$extension"
+  curl $download_link --output "$anm_dir/versions/node/$download_filename.$EXT"
 
   echo "Extracting nodejs to $node_install_dir"
   if windows; then
-    unzip -q "$anm_dir/versions/node/$download_filename.$extension" -d "$anm_dir/versions/node"
+    unzip -q "$anm_dir/versions/node/$download_filename.$EXT" -d "$anm_dir/versions/node"
     rm -rf "$node_install_dir"
     mv "$anm_dir/versions/node/$download_filename" "$node_install_dir"
-    rm "$anm_dir/versions/node/$download_filename.$extension"
+    rm "$anm_dir/versions/node/$download_filename.$EXT"
 
     # making all nodejs binaries executable for Cygwin compatibility
     chmod +x "$node_install_dir/node.exe"
@@ -323,10 +311,10 @@ anm_install() {
     chmod +x "$node_install_dir/corepack"
   else
     # is_sudo tar -xf "/tmp/$download_filename" -C $node_install_dir --strip-components=1
-    is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$extension" \
+    is_sudo tar -xf "$anm_dir/versions/node/$download_filename.$EXT" \
       -C $node_install_dir \
       --strip-components=1
-    rm $anm_dir/versions/node/$download_filename.$extension
+    rm $anm_dir/versions/node/$download_filename.$EXT
   fi
 
   echo "$version" | is_sudo tee -a $anm_dir/installed &> /dev/null
