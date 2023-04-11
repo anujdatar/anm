@@ -90,18 +90,18 @@
     fi
 
     if [ "$dist" = "debian" ]; then
-      dependency_list="curl wget git python3 python3-pip"
+      dependency_list="curl wget git python3 python3-pip python3-urllib3 python3-packaging"
       update="apt-get update"
       upgrade="apt-get upgrade -y"
       install="apt-get install -y"
       check="dpkg-query -s"
     elif [ "$dist" = "fedora" ]; then
-      dependency_list="curl wget git python3 python3-pip"
+      dependency_list="curl wget git python3 python3-pip python3-urllib3 python3-packaging"
       upgrade="dnf upgrade -y"
       install="dnf install -y"
       check="dnf list installed"
     elif [ "$dist" = "arch" ]; then
-      dependency_list="curl wget git python3 python-pip"
+      dependency_list="curl wget git python3 python-pip python-urllib3 python-packaging"
       upgrade="pacman -Syu --noconfirm"
       install="pacman -S --noconfirm"
       check="pacman -Qi"
@@ -204,8 +204,10 @@
   }
 
   # install pip dependencies
-  echo "Installing pip dependencies: packaging urllib3"
-  pip3 install packaging urllib3
+  if ! linux; then
+    echo "Installing pip dependencies: packaging urllib3"
+    pip3 install packaging urllib3
+  fi
 
   # check pwd and clone Git repo if necessary
   if [ -f "$(pwd)/anm.sh" ]; then
