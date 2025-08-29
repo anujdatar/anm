@@ -3,7 +3,8 @@ import sys
 import json
 from urllib.request import urlopen
 from packaging.version import Version
-from urllib3 import Retry
+
+# from urllib3 import Retry
 
 """
 download and parse json index of node.js distributions
