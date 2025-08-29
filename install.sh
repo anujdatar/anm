@@ -96,7 +96,7 @@
       install="apt-get install -y"
       check="dpkg-query -s"
     elif [ "$dist" = "fedora" ]; then
-      dependency_list="curl wget git python3 python3-pip python3-urllib3 python3-packaging"
+      dependency_list="curl wget2 wget2-wget git python3 python3-pip python3-urllib3 python3-packaging"
       upgrade="dnf upgrade -y"
       install="dnf install -y"
       check="dnf list installed"
